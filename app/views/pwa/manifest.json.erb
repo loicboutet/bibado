@@ -1,22 +1,62 @@
 {
-  "name": "BaseRailsApp",
+  "name": "Bibado - Weaning With Meaning",
+  "short_name": "Bibado",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "/icon.png",
+      "src": "/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "/mockups",
   "display": "standalone",
   "scope": "/",
-  "description": "BaseRailsApp.",
-  "theme_color": "red",
-  "background_color": "red"
+  "description": "Your complete guide to weaning with meaning. Track meals, explore foods, and help your baby develop healthy eating habits.",
+  "theme_color": "#FF6B6B",
+  "background_color": "#FFFFFF",
+  "orientation": "portrait",
+  "categories": ["health", "lifestyle", "food"],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home Screen"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Plan",
+      "short_name": "Plan",
+      "description": "View today's meal plan",
+      "url": "/mockups/meal_plan/day",
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Log Meal",
+      "short_name": "Log",
+      "description": "Log a meal feedback",
+      "url": "/mockups/meal_plan/feedback",
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Foods",
+      "short_name": "Foods",
+      "description": "Browse the foods database",
+      "url": "/mockups/foods",
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96" }]
+    }
+  ]
 }
