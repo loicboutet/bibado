@@ -5,18 +5,41 @@ export default class extends Controller {
   static targets = ["mealSlot", "swapModal", "previewModal", "previewContent"]
   
   draggedItem = null
-  touchStartData = null
   currentSlot = null
   dragClone = null
+  longPressTimer = null
+  touchStartX = 0
+  touchStartY = 0
+  hasMoved = false
 
   connect() {
     console.log("Meal calendar controller connected")
-    this.setupDragAndDrop()
-    this.setupMobileDrag()
+    this.setupDesktopDrag()
+    this.setupMobileTouchEvents()
   }
 
-  setupDragAndDrop() {
-    // Desktop drag events
+  setupMobileTouchEvents() {
+    // Add non-passive touchmove listener to allow preventDefault during drag
+    this.mealSlotTargets.forEach(slot => {
+      slot.addEventListener('touchmove', (e) => {
+        if (this.draggedItem && this.dragClone) {
+          e.preventDefault()
+          const touch = e.touches[0]
+          this.moveDragClone(touch.clientX, touch.clientY)
+        }
+      }, { passive: false })
+    })
+  }
+
+  disconnect() {
+    this.cancelMobileDrag()
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer)
+    }
+  }
+
+  setupDesktopDrag() {
+    // Desktop drag events (HTML5 drag API)
     this.mealSlotTargets.forEach(slot => {
       slot.setAttribute('draggable', 'true')
       slot.addEventListener('dragstart', (e) => this.handleDragStart(e, slot))
@@ -28,60 +51,59 @@ export default class extends Controller {
     })
   }
 
-  setupMobileDrag() {
-    // Mobile touch drag
-    this.mealSlotTargets.forEach(slot => {
-      let longPressTimer = null
-      let startX, startY
-      let hasMoved = false
+  // Mobile touch handlers (called via data-action in HTML)
+  handleTouchStart(event) {
+    const slot = event.currentTarget
+    if (!slot.dataset.hasMeal) return
+    
+    this.hasMoved = false
+    this.touchStartX = event.touches[0].clientX
+    this.touchStartY = event.touches[0].clientY
+    
+    // Long press to initiate drag
+    this.longPressTimer = setTimeout(() => {
+      if (!this.hasMoved) {
+        this.startMobileDrag(slot, this.touchStartX, this.touchStartY)
+      }
+    }, 400)
+  }
 
-      slot.addEventListener('touchstart', (e) => {
-        if (!slot.dataset.hasMeal) return
-        
-        hasMoved = false
-        startX = e.touches[0].clientX
-        startY = e.touches[0].clientY
-        
-        // Long press to start drag
-        longPressTimer = setTimeout(() => {
-          if (!hasMoved) {
-            e.preventDefault()
-            this.startMobileDrag(slot, startX, startY)
-          }
-        }, 400)
-      }, { passive: false })
+  handleTouchMove(event) {
+    const touch = event.touches[0]
+    const dx = Math.abs(touch.clientX - this.touchStartX)
+    const dy = Math.abs(touch.clientY - this.touchStartY)
+    
+    // If moved a bit, cancel long press
+    if (dx > 5 || dy > 5) {
+      this.hasMoved = true
+      if (!this.draggedItem && this.longPressTimer) {
+        clearTimeout(this.longPressTimer)
+      }
+    }
+    
+    // Handle drag move
+    if (this.draggedItem && this.dragClone) {
+      event.preventDefault()
+      this.moveDragClone(touch.clientX, touch.clientY)
+    }
+  }
 
-      slot.addEventListener('touchmove', (e) => {
-        const dx = Math.abs(e.touches[0].clientX - startX)
-        const dy = Math.abs(e.touches[0].clientY - startY)
-        
-        // If moved a bit, cancel long press but don't start drag yet
-        if (dx > 5 || dy > 5) {
-          hasMoved = true
-          if (!this.draggedItem) {
-            clearTimeout(longPressTimer)
-          }
-        }
-        
-        // If we're dragging, handle the move
-        if (this.draggedItem && this.dragClone) {
-          e.preventDefault()
-          this.handleMobileMove(e)
-        }
-      }, { passive: false })
+  handleTouchEnd(event) {
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer)
+    }
+    
+    if (this.draggedItem) {
+      const touch = event.changedTouches[0]
+      this.finishMobileDrag(touch.clientX, touch.clientY)
+    }
+  }
 
-      slot.addEventListener('touchend', (e) => {
-        clearTimeout(longPressTimer)
-        if (this.draggedItem) {
-          this.handleMobileEnd(e)
-        }
-      })
-
-      slot.addEventListener('touchcancel', () => {
-        clearTimeout(longPressTimer)
-        this.cancelMobileDrag()
-      })
-    })
+  handleTouchCancel() {
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer)
+    }
+    this.cancelMobileDrag()
   }
 
   // Desktop drag handlers
@@ -129,7 +151,7 @@ export default class extends Controller {
     this.clearDropTargets()
   }
 
-  // Mobile drag handlers
+  // Mobile drag functions
   startMobileDrag(slot, x, y) {
     this.draggedItem = slot
     
@@ -138,40 +160,40 @@ export default class extends Controller {
       navigator.vibrate(50)
     }
     
-    // Create a floating clone
-    this.dragClone = slot.cloneNode(true)
-    this.dragClone.classList.add('fixed', 'z-[100]', 'shadow-2xl', 'scale-110', 'pointer-events-none', 'rounded-lg')
-    this.dragClone.style.width = `${slot.offsetWidth}px`
-    this.dragClone.style.height = `${slot.offsetHeight}px`
-    this.dragClone.style.left = `${x - slot.offsetWidth / 2}px`
-    this.dragClone.style.top = `${y - slot.offsetHeight / 2}px`
+    // Create floating clone
+    this.dragClone = document.createElement('div')
+    this.dragClone.className = 'fixed z-[100] bg-white shadow-2xl rounded-lg p-2 pointer-events-none flex flex-col items-center justify-center'
+    this.dragClone.style.width = `${slot.offsetWidth + 10}px`
+    this.dragClone.style.height = `${slot.offsetHeight + 10}px`
+    this.dragClone.style.left = `${x - (slot.offsetWidth + 10) / 2}px`
+    this.dragClone.style.top = `${y - (slot.offsetHeight + 10) / 2}px`
+    this.dragClone.style.transform = 'scale(1.15)'
     this.dragClone.style.transition = 'none'
+    this.dragClone.innerHTML = `
+      <span class="text-2xl">${slot.dataset.mealEmoji || '🍽️'}</span>
+      <span class="text-xs text-gray-600 mt-1">${(slot.dataset.mealName || '').split(' ')[0]}</span>
+    `
     document.body.appendChild(this.dragClone)
     
     // Dim the original
-    slot.classList.add('opacity-30')
+    slot.classList.add('opacity-30', 'scale-95')
     
-    // Show instruction
+    // Show drag instruction
     this.showDragInstruction()
   }
 
-  handleMobileMove(e) {
+  moveDragClone(x, y) {
     if (!this.dragClone) return
     
-    const touch = e.touches[0]
-    const x = touch.clientX
-    const y = touch.clientY
-    
-    // Move the clone
     this.dragClone.style.left = `${x - this.dragClone.offsetWidth / 2}px`
     this.dragClone.style.top = `${y - this.dragClone.offsetHeight / 2}px`
     
-    // Find element under touch (excluding clone)
+    // Find element under finger
     this.dragClone.style.display = 'none'
     const elementBelow = document.elementFromPoint(x, y)
     this.dragClone.style.display = ''
     
-    // Highlight drop target
+    // Highlight drop targets
     const dropTarget = elementBelow?.closest('[data-meal-calendar-target="mealSlot"]')
     
     this.mealSlotTargets.forEach(s => {
@@ -183,12 +205,8 @@ export default class extends Controller {
     })
   }
 
-  handleMobileEnd(e) {
+  finishMobileDrag(x, y) {
     if (!this.draggedItem) return
-    
-    const touch = e.changedTouches[0]
-    const x = touch.clientX
-    const y = touch.clientY
     
     // Find drop target
     if (this.dragClone) {
@@ -213,7 +231,7 @@ export default class extends Controller {
     
     // Reset original
     if (this.draggedItem) {
-      this.draggedItem.classList.remove('opacity-30')
+      this.draggedItem.classList.remove('opacity-30', 'scale-95')
     }
     
     this.draggedItem = null
@@ -233,21 +251,18 @@ export default class extends Controller {
     
     const instruction = document.createElement('div')
     instruction.id = 'drag-instruction'
-    instruction.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-[#2C3E50] text-white px-4 py-2 rounded-full shadow-lg z-[101] text-sm font-medium'
-    instruction.textContent = 'Drag to swap meals'
+    instruction.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-[#2C3E50] text-white px-4 py-2 rounded-full shadow-lg z-[101] text-sm font-medium animate-pulse'
+    instruction.textContent = '👆 Drag to swap meals'
     document.body.appendChild(instruction)
   }
 
   hideDragInstruction() {
     const instruction = document.getElementById('drag-instruction')
-    if (instruction) {
-      instruction.remove()
-    }
+    if (instruction) instruction.remove()
   }
 
-  // Swap two slots
+  // Swap two meal slots
   swapSlots(sourceSlot, targetSlot) {
-    // Get all data from both slots
     const sourceData = {
       innerHTML: sourceSlot.innerHTML,
       mealId: sourceSlot.dataset.mealId,
@@ -268,7 +283,7 @@ export default class extends Controller {
       allergen: targetSlot.dataset.allergen
     }
     
-    // Animate swap
+    // Animate
     sourceSlot.classList.add('transition-transform', 'duration-200', 'scale-90')
     targetSlot.classList.add('transition-transform', 'duration-200', 'scale-90')
     
@@ -293,7 +308,7 @@ export default class extends Controller {
       sourceSlot.classList.remove('scale-90')
       targetSlot.classList.remove('scale-90')
       
-      this.showToast('Meals swapped!', '✓')
+      this.showToast('Meals swapped!', '✅')
     }, 100)
     
     setTimeout(() => {
@@ -306,8 +321,6 @@ export default class extends Controller {
   showPreview(e) {
     const slot = e.currentTarget
     if (!slot.dataset.hasMeal) return
-    
-    // Don't show preview if we're dragging
     if (this.draggedItem) return
     
     this.currentSlot = slot
@@ -354,7 +367,6 @@ export default class extends Controller {
   }
 
   hidePreview(e) {
-    // Only hide if clicking on the backdrop, not the modal content
     if (e && e.target !== this.previewModalTarget) return
     
     if (this.hasPreviewModalTarget) {
@@ -363,7 +375,6 @@ export default class extends Controller {
     }
   }
 
-  // Swap modal
   openSwapModal() {
     this.hidePreview({ target: this.previewModalTarget })
     
@@ -389,7 +400,6 @@ export default class extends Controller {
     }
   }
 
-  // Actually swap the meal when option is selected
   selectSwapOption(e) {
     const option = e.currentTarget
     const newMealId = option.dataset.mealId
@@ -397,12 +407,10 @@ export default class extends Controller {
     const newMealEmoji = option.dataset.mealEmoji
     
     if (this.currentSlot) {
-      // Update dataset
       this.currentSlot.dataset.mealId = newMealId
       this.currentSlot.dataset.mealName = newMealName
       this.currentSlot.dataset.mealEmoji = newMealEmoji
       
-      // Update visual - rebuild the inner HTML
       const ironRich = this.currentSlot.dataset.ironRich === 'true'
       const allergen = this.currentSlot.dataset.allergen === 'true'
       
@@ -415,7 +423,6 @@ export default class extends Controller {
         <span class="meal-name text-[10px] text-gray-600 text-center leading-tight line-clamp-2">${newMealName.split(' ')[0]}</span>
       `
       
-      // Animate the change
       this.currentSlot.classList.add('scale-110', 'bg-green-50')
       setTimeout(() => {
         this.currentSlot.classList.remove('scale-110', 'bg-green-50')
@@ -428,21 +435,16 @@ export default class extends Controller {
     this.currentSlot = null
   }
 
-  showToast(message, icon = '✓') {
-    // Remove existing toast
+  showToast(message, icon = '✅') {
     const existing = document.getElementById('meal-toast')
     if (existing) existing.remove()
     
     const toast = document.createElement('div')
     toast.id = 'meal-toast'
     toast.className = 'fixed bottom-32 left-1/2 -translate-x-1/2 bg-[#4ECDC4] text-white pl-3 pr-4 py-2.5 rounded-full shadow-lg z-[100] flex items-center gap-2'
-    toast.innerHTML = `
-      <span class="text-lg">${icon}</span>
-      <span class="text-sm font-medium">${message}</span>
-    `
+    toast.innerHTML = `<span class="text-lg">${icon}</span><span class="text-sm font-medium">${message}</span>`
     document.body.appendChild(toast)
     
-    // Animate in
     toast.style.transform = 'translate(-50%, 20px)'
     toast.style.opacity = '0'
     requestAnimationFrame(() => {
@@ -451,7 +453,6 @@ export default class extends Controller {
       toast.style.opacity = '1'
     })
     
-    // Remove after delay
     setTimeout(() => {
       toast.style.transform = 'translate(-50%, 20px)'
       toast.style.opacity = '0'

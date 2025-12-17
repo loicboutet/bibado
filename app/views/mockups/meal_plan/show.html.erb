@@ -89,7 +89,7 @@
           <div class="grid grid-cols-7 gap-px bg-gray-100 p-px">
             <% week_meals[meal_type].each_with_index do |meal, day_idx| %>
               <div 
-                class="bg-white p-1 min-h-[70px] flex flex-col items-center justify-center cursor-grab active:cursor-grabbing transition-all duration-200 hover:bg-gray-50 relative"
+                class="bg-white p-1 min-h-[70px] flex flex-col items-center justify-center cursor-grab active:cursor-grabbing transition-all duration-200 hover:bg-gray-50 relative touch-none"
                 data-meal-calendar-target="mealSlot"
                 data-meal-id="<%= meal[:id] %>"
                 data-meal-name="<%= meal[:name] %>"
@@ -97,7 +97,7 @@
                 data-has-meal="true"
                 data-iron-rich="<%= meal[:iron] %>"
                 data-allergen="<%= meal[:allergen] %>"
-                data-action="click->meal-calendar#showPreview"
+                data-action="click->meal-calendar#showPreview touchstart->meal-calendar#handleTouchStart touchend->meal-calendar#handleTouchEnd touchcancel->meal-calendar#handleTouchCancel"
               >
                 <!-- Iron/Allergen indicators -->
                 <div class="absolute top-0.5 right-0.5 flex gap-0.5">
