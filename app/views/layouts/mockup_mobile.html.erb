@@ -14,8 +14,8 @@
 
     <%= yield :head %>
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <!-- PWA Manifest (enabled via config/routes.rb) -->
+    <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
     
     <!-- Icons -->
     <link rel="icon" href="/icon.png" type="image/png">
@@ -70,6 +70,7 @@
       /* Safe area for notch */
       .safe-area-top { padding-top: env(safe-area-inset-top, 20px); }
       .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
+      
     </style>
   </head>
 
@@ -149,7 +150,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
+          navigator.serviceWorker.register('<%= pwa_service_worker_path %>')
             .then((registration) => {
               console.log('ServiceWorker registered:', registration.scope);
             })
