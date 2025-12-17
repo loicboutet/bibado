@@ -6,18 +6,19 @@ export default class extends Controller {
   
   draggedItem = null
   touchStartData = null
+  currentSlot = null
+  dragClone = null
 
   connect() {
     console.log("Meal calendar controller connected")
     this.setupDragAndDrop()
-    this.setupTouchInteractions()
+    this.setupMobileDrag()
   }
 
   setupDragAndDrop() {
-    // Add drag events to all meal slots
+    // Desktop drag events
     this.mealSlotTargets.forEach(slot => {
       slot.setAttribute('draggable', 'true')
-      
       slot.addEventListener('dragstart', (e) => this.handleDragStart(e, slot))
       slot.addEventListener('dragend', (e) => this.handleDragEnd(e, slot))
       slot.addEventListener('dragover', (e) => this.handleDragOver(e))
@@ -27,76 +28,79 @@ export default class extends Controller {
     })
   }
 
-  setupTouchInteractions() {
-    // Long-press to drag on mobile
+  setupMobileDrag() {
+    // Mobile touch drag
     this.mealSlotTargets.forEach(slot => {
       let longPressTimer = null
-      let touchMoved = false
+      let startX, startY
+      let hasMoved = false
 
       slot.addEventListener('touchstart', (e) => {
-        touchMoved = false
-        this.touchStartData = {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-          slot: slot
-        }
+        if (!slot.dataset.hasMeal) return
         
+        hasMoved = false
+        startX = e.touches[0].clientX
+        startY = e.touches[0].clientY
+        
+        // Long press to start drag
         longPressTimer = setTimeout(() => {
-          if (!touchMoved) {
-            this.startTouchDrag(slot)
+          if (!hasMoved) {
+            e.preventDefault()
+            this.startMobileDrag(slot, startX, startY)
           }
-        }, 500)
-      })
+        }, 400)
+      }, { passive: false })
 
       slot.addEventListener('touchmove', (e) => {
-        const threshold = 10
-        const dx = Math.abs(e.touches[0].clientX - this.touchStartData.x)
-        const dy = Math.abs(e.touches[0].clientY - this.touchStartData.y)
+        const dx = Math.abs(e.touches[0].clientX - startX)
+        const dy = Math.abs(e.touches[0].clientY - startY)
         
-        if (dx > threshold || dy > threshold) {
-          touchMoved = true
-          if (this.draggedItem) {
-            e.preventDefault()
-            this.handleTouchMove(e)
+        // If moved a bit, cancel long press but don't start drag yet
+        if (dx > 5 || dy > 5) {
+          hasMoved = true
+          if (!this.draggedItem) {
+            clearTimeout(longPressTimer)
           }
         }
         
-        if (!this.draggedItem) {
-          clearTimeout(longPressTimer)
+        // If we're dragging, handle the move
+        if (this.draggedItem && this.dragClone) {
+          e.preventDefault()
+          this.handleMobileMove(e)
         }
-      })
+      }, { passive: false })
 
       slot.addEventListener('touchend', (e) => {
         clearTimeout(longPressTimer)
         if (this.draggedItem) {
-          this.handleTouchEnd(e)
+          this.handleMobileEnd(e)
         }
+      })
+
+      slot.addEventListener('touchcancel', () => {
+        clearTimeout(longPressTimer)
+        this.cancelMobileDrag()
       })
     })
   }
 
+  // Desktop drag handlers
   handleDragStart(e, slot) {
-    if (!slot.dataset.hasMeal) return
+    if (!slot.dataset.hasMeal) {
+      e.preventDefault()
+      return
+    }
     
     this.draggedItem = slot
     slot.classList.add('opacity-50', 'scale-95')
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.setData('text/plain', slot.dataset.mealId)
-    
-    // Add visual feedback
-    setTimeout(() => {
-      slot.classList.add('dragging')
-    }, 0)
   }
 
   handleDragEnd(e, slot) {
-    slot.classList.remove('opacity-50', 'scale-95', 'dragging')
+    slot.classList.remove('opacity-50', 'scale-95')
     this.draggedItem = null
-    
-    // Remove all drop target indicators
-    this.mealSlotTargets.forEach(s => {
-      s.classList.remove('drop-target', 'ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
-    })
+    this.clearDropTargets()
   }
 
   handleDragOver(e) {
@@ -107,192 +111,261 @@ export default class extends Controller {
   handleDragEnter(e, slot) {
     e.preventDefault()
     if (slot !== this.draggedItem) {
-      slot.classList.add('drop-target', 'ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
+      slot.classList.add('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
     }
   }
 
   handleDragLeave(e, slot) {
-    slot.classList.remove('drop-target', 'ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
+    slot.classList.remove('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
   }
 
   handleDrop(e, targetSlot) {
     e.preventDefault()
     
     if (this.draggedItem && targetSlot !== this.draggedItem) {
-      this.swapMeals(this.draggedItem, targetSlot)
+      this.swapSlots(this.draggedItem, targetSlot)
     }
     
-    targetSlot.classList.remove('drop-target', 'ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
+    this.clearDropTargets()
   }
 
-  // Touch drag handling for mobile
-  startTouchDrag(slot) {
-    if (!slot.dataset.hasMeal) return
-    
+  // Mobile drag handlers
+  startMobileDrag(slot, x, y) {
     this.draggedItem = slot
-    slot.classList.add('scale-110', 'z-50', 'shadow-2xl', 'touch-dragging')
     
-    // Haptic feedback if available
+    // Vibrate for feedback
     if (navigator.vibrate) {
       navigator.vibrate(50)
     }
+    
+    // Create a floating clone
+    this.dragClone = slot.cloneNode(true)
+    this.dragClone.classList.add('fixed', 'z-[100]', 'shadow-2xl', 'scale-110', 'pointer-events-none', 'rounded-lg')
+    this.dragClone.style.width = `${slot.offsetWidth}px`
+    this.dragClone.style.height = `${slot.offsetHeight}px`
+    this.dragClone.style.left = `${x - slot.offsetWidth / 2}px`
+    this.dragClone.style.top = `${y - slot.offsetHeight / 2}px`
+    this.dragClone.style.transition = 'none'
+    document.body.appendChild(this.dragClone)
+    
+    // Dim the original
+    slot.classList.add('opacity-30')
+    
+    // Show instruction
+    this.showDragInstruction()
   }
 
-  handleTouchMove(e) {
-    if (!this.draggedItem) return
+  handleMobileMove(e) {
+    if (!this.dragClone) return
     
     const touch = e.touches[0]
-    const rect = this.draggedItem.getBoundingClientRect()
+    const x = touch.clientX
+    const y = touch.clientY
     
-    // Position the dragged element under finger
-    this.draggedItem.style.position = 'fixed'
-    this.draggedItem.style.left = `${touch.clientX - rect.width / 2}px`
-    this.draggedItem.style.top = `${touch.clientY - rect.height / 2}px`
+    // Move the clone
+    this.dragClone.style.left = `${x - this.dragClone.offsetWidth / 2}px`
+    this.dragClone.style.top = `${y - this.dragClone.offsetHeight / 2}px`
     
-    // Highlight drop targets
-    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY)
+    // Find element under touch (excluding clone)
+    this.dragClone.style.display = 'none'
+    const elementBelow = document.elementFromPoint(x, y)
+    this.dragClone.style.display = ''
+    
+    // Highlight drop target
     const dropTarget = elementBelow?.closest('[data-meal-calendar-target="mealSlot"]')
     
     this.mealSlotTargets.forEach(s => {
       if (s === dropTarget && s !== this.draggedItem) {
-        s.classList.add('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
-      } else {
-        s.classList.remove('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
+        s.classList.add('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20', 'scale-105')
+      } else if (s !== this.draggedItem) {
+        s.classList.remove('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20', 'scale-105')
       }
     })
   }
 
-  handleTouchEnd(e) {
+  handleMobileEnd(e) {
     if (!this.draggedItem) return
     
-    // Find drop target
     const touch = e.changedTouches[0]
-    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY)
+    const x = touch.clientX
+    const y = touch.clientY
+    
+    // Find drop target
+    if (this.dragClone) {
+      this.dragClone.style.display = 'none'
+    }
+    const elementBelow = document.elementFromPoint(x, y)
     const dropTarget = elementBelow?.closest('[data-meal-calendar-target="mealSlot"]')
     
     if (dropTarget && dropTarget !== this.draggedItem) {
-      this.swapMeals(this.draggedItem, dropTarget)
+      this.swapSlots(this.draggedItem, dropTarget)
     }
     
-    // Reset dragged item
-    this.draggedItem.classList.remove('scale-110', 'z-50', 'shadow-2xl', 'touch-dragging')
-    this.draggedItem.style.position = ''
-    this.draggedItem.style.left = ''
-    this.draggedItem.style.top = ''
-    this.draggedItem = null
+    this.cancelMobileDrag()
+  }
+
+  cancelMobileDrag() {
+    // Remove clone
+    if (this.dragClone) {
+      this.dragClone.remove()
+      this.dragClone = null
+    }
     
-    // Clear all highlights
+    // Reset original
+    if (this.draggedItem) {
+      this.draggedItem.classList.remove('opacity-30')
+    }
+    
+    this.draggedItem = null
+    this.clearDropTargets()
+    this.hideDragInstruction()
+  }
+
+  clearDropTargets() {
     this.mealSlotTargets.forEach(s => {
-      s.classList.remove('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20')
+      s.classList.remove('ring-2', 'ring-[#4ECDC4]', 'bg-[#4ECDC4]/20', 'scale-105')
     })
   }
 
-  swapMeals(sourceSlot, targetSlot) {
-    // Animate the swap
-    sourceSlot.classList.add('transition-all', 'duration-300')
-    targetSlot.classList.add('transition-all', 'duration-300')
+  showDragInstruction() {
+    const existing = document.getElementById('drag-instruction')
+    if (existing) return
     
-    // Get content
-    const sourceContent = sourceSlot.innerHTML
-    const targetContent = targetSlot.innerHTML
-    const sourceMealId = sourceSlot.dataset.mealId
-    const targetMealId = targetSlot.dataset.mealId
-    const sourceHasMeal = sourceSlot.dataset.hasMeal
-    const targetHasMeal = targetSlot.dataset.hasMeal
+    const instruction = document.createElement('div')
+    instruction.id = 'drag-instruction'
+    instruction.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-[#2C3E50] text-white px-4 py-2 rounded-full shadow-lg z-[101] text-sm font-medium'
+    instruction.textContent = 'Drag to swap meals'
+    document.body.appendChild(instruction)
+  }
+
+  hideDragInstruction() {
+    const instruction = document.getElementById('drag-instruction')
+    if (instruction) {
+      instruction.remove()
+    }
+  }
+
+  // Swap two slots
+  swapSlots(sourceSlot, targetSlot) {
+    // Get all data from both slots
+    const sourceData = {
+      innerHTML: sourceSlot.innerHTML,
+      mealId: sourceSlot.dataset.mealId,
+      mealName: sourceSlot.dataset.mealName,
+      mealEmoji: sourceSlot.dataset.mealEmoji,
+      hasMeal: sourceSlot.dataset.hasMeal,
+      ironRich: sourceSlot.dataset.ironRich,
+      allergen: sourceSlot.dataset.allergen
+    }
     
-    // Apply swap animation
-    sourceSlot.classList.add('scale-90')
-    targetSlot.classList.add('scale-90')
+    const targetData = {
+      innerHTML: targetSlot.innerHTML,
+      mealId: targetSlot.dataset.mealId,
+      mealName: targetSlot.dataset.mealName,
+      mealEmoji: targetSlot.dataset.mealEmoji,
+      hasMeal: targetSlot.dataset.hasMeal,
+      ironRich: targetSlot.dataset.ironRich,
+      allergen: targetSlot.dataset.allergen
+    }
+    
+    // Animate swap
+    sourceSlot.classList.add('transition-transform', 'duration-200', 'scale-90')
+    targetSlot.classList.add('transition-transform', 'duration-200', 'scale-90')
     
     setTimeout(() => {
-      // Swap content
-      sourceSlot.innerHTML = targetContent
-      targetSlot.innerHTML = sourceContent
-      sourceSlot.dataset.mealId = targetMealId || ''
-      targetSlot.dataset.mealId = sourceMealId || ''
-      sourceSlot.dataset.hasMeal = targetHasMeal || ''
-      targetSlot.dataset.hasMeal = sourceHasMeal || ''
+      // Swap visual and data
+      sourceSlot.innerHTML = targetData.innerHTML
+      sourceSlot.dataset.mealId = targetData.mealId || ''
+      sourceSlot.dataset.mealName = targetData.mealName || ''
+      sourceSlot.dataset.mealEmoji = targetData.mealEmoji || ''
+      sourceSlot.dataset.hasMeal = targetData.hasMeal || ''
+      sourceSlot.dataset.ironRich = targetData.ironRich || ''
+      sourceSlot.dataset.allergen = targetData.allergen || ''
       
-      // Remove animation
+      targetSlot.innerHTML = sourceData.innerHTML
+      targetSlot.dataset.mealId = sourceData.mealId || ''
+      targetSlot.dataset.mealName = sourceData.mealName || ''
+      targetSlot.dataset.mealEmoji = sourceData.mealEmoji || ''
+      targetSlot.dataset.hasMeal = sourceData.hasMeal || ''
+      targetSlot.dataset.ironRich = sourceData.ironRich || ''
+      targetSlot.dataset.allergen = sourceData.allergen || ''
+      
       sourceSlot.classList.remove('scale-90')
       targetSlot.classList.remove('scale-90')
       
-      // Show success feedback
-      this.showSwapSuccess()
-    }, 150)
+      this.showToast('Meals swapped!', '✓')
+    }, 100)
     
     setTimeout(() => {
-      sourceSlot.classList.remove('transition-all', 'duration-300')
-      targetSlot.classList.remove('transition-all', 'duration-300')
-    }, 500)
+      sourceSlot.classList.remove('transition-transform', 'duration-200')
+      targetSlot.classList.remove('transition-transform', 'duration-200')
+    }, 400)
   }
 
-  showSwapSuccess() {
-    // Create toast notification
-    const toast = document.createElement('div')
-    toast.className = 'fixed bottom-32 left-1/2 -translate-x-1/2 bg-[#4ECDC4] text-white px-4 py-2 rounded-full shadow-lg z-50 flex items-center gap-2 animate-bounce-in'
-    toast.innerHTML = `
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-      </svg>
-      <span class="text-sm font-medium">Meals swapped!</span>
-    `
-    document.body.appendChild(toast)
-    
-    setTimeout(() => {
-      toast.classList.add('opacity-0')
-      setTimeout(() => toast.remove(), 300)
-    }, 1500)
-  }
-
-  // Show meal preview on tap/hover
+  // Show meal preview modal
   showPreview(e) {
     const slot = e.currentTarget
     if (!slot.dataset.hasMeal) return
     
-    const mealData = {
-      id: slot.dataset.mealId,
-      name: slot.dataset.mealName,
-      emoji: slot.dataset.mealEmoji,
+    // Don't show preview if we're dragging
+    if (this.draggedItem) return
+    
+    this.currentSlot = slot
+    
+    const meal = {
+      name: slot.dataset.mealName || 'Unknown Meal',
+      emoji: slot.dataset.mealEmoji || '🍽️',
       ironRich: slot.dataset.ironRich === 'true',
       allergen: slot.dataset.allergen === 'true'
     }
     
-    if (this.hasPreviewModalTarget) {
-      this.previewContentTarget.innerHTML = this.buildPreviewContent(mealData)
+    if (this.hasPreviewModalTarget && this.hasPreviewContentTarget) {
+      this.previewContentTarget.innerHTML = this.buildPreviewHTML(meal)
       this.previewModalTarget.classList.remove('hidden')
+      this.previewModalTarget.classList.add('flex')
     }
   }
 
-  hidePreview() {
-    if (this.hasPreviewModalTarget) {
-      this.previewModalTarget.classList.add('hidden')
-    }
-  }
-
-  buildPreviewContent(meal) {
+  buildPreviewHTML(meal) {
+    const badges = []
+    if (meal.ironRich) badges.push('<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs">🩸 Iron Rich</span>')
+    if (meal.allergen) badges.push('<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs">⚠️ Allergen</span>')
+    
     return `
       <div class="text-center">
-        <div class="w-20 h-20 mx-auto bg-gray-100 rounded-xl flex items-center justify-center mb-3">
-          <span class="text-4xl">${meal.emoji || '🍽️'}</span>
+        <div class="w-20 h-20 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center mb-3">
+          <span class="text-4xl">${meal.emoji}</span>
         </div>
-        <h3 class="font-bold text-[#2C3E50]">${meal.name || 'Untitled Meal'}</h3>
-        <div class="flex justify-center gap-2 mt-2">
-          ${meal.ironRich ? '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs">🩸 Iron Rich</span>' : ''}
-          ${meal.allergen ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs">⚠️ Allergen</span>' : ''}
-        </div>
-        <div class="mt-4 flex gap-2 justify-center">
-          <button class="px-4 py-2 bg-[#FF6B6B] text-white rounded-lg text-sm font-medium">View Recipe</button>
-          <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium" data-action="click->meal-calendar#openSwapModal">Swap</button>
+        <h3 class="font-bold text-lg text-[#2C3E50]">${meal.name}</h3>
+        ${badges.length ? `<div class="flex justify-center gap-2 mt-2">${badges.join('')}</div>` : ''}
+        <div class="mt-5 flex gap-3 justify-center">
+          <button class="px-5 py-2.5 bg-[#FF6B6B] text-white rounded-xl text-sm font-semibold hover:bg-[#E85555] transition-colors">
+            View Recipe
+          </button>
+          <button 
+            class="px-5 py-2.5 bg-gray-100 text-[#2C3E50] rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors"
+            data-action="click->meal-calendar#openSwapModal"
+          >
+            Swap
+          </button>
         </div>
       </div>
     `
   }
 
-  // Swap modal functionality
-  openSwapModal(e) {
-    const slot = e.currentTarget.closest('[data-meal-calendar-target="mealSlot"]') || this.currentSlot
-    this.currentSlot = slot
+  hidePreview(e) {
+    // Only hide if clicking on the backdrop, not the modal content
+    if (e && e.target !== this.previewModalTarget) return
+    
+    if (this.hasPreviewModalTarget) {
+      this.previewModalTarget.classList.add('hidden')
+      this.previewModalTarget.classList.remove('flex')
+    }
+  }
+
+  // Swap modal
+  openSwapModal() {
+    this.hidePreview({ target: this.previewModalTarget })
     
     if (this.hasSwapModalTarget) {
       this.swapModalTarget.classList.remove('hidden')
@@ -300,14 +373,23 @@ export default class extends Controller {
     }
   }
 
-  closeSwapModal() {
+  closeSwapModal(e) {
+    if (e && e.target !== this.swapModalTarget && !e.target.closest('[data-close-modal]')) return
+    
     if (this.hasSwapModalTarget) {
       this.swapModalTarget.classList.add('hidden')
       this.swapModalTarget.classList.remove('flex')
     }
-    this.hidePreview()
   }
 
+  forceCloseSwapModal() {
+    if (this.hasSwapModalTarget) {
+      this.swapModalTarget.classList.add('hidden')
+      this.swapModalTarget.classList.remove('flex')
+    }
+  }
+
+  // Actually swap the meal when option is selected
   selectSwapOption(e) {
     const option = e.currentTarget
     const newMealId = option.dataset.mealId
@@ -315,20 +397,65 @@ export default class extends Controller {
     const newMealEmoji = option.dataset.mealEmoji
     
     if (this.currentSlot) {
-      // Update the slot with new meal
+      // Update dataset
       this.currentSlot.dataset.mealId = newMealId
       this.currentSlot.dataset.mealName = newMealName
       this.currentSlot.dataset.mealEmoji = newMealEmoji
-      this.currentSlot.dataset.hasMeal = 'true'
       
-      // Update visual
-      const emojiEl = this.currentSlot.querySelector('.meal-emoji')
-      const nameEl = this.currentSlot.querySelector('.meal-name')
-      if (emojiEl) emojiEl.textContent = newMealEmoji
-      if (nameEl) nameEl.textContent = newMealName.split(' ')[0]
+      // Update visual - rebuild the inner HTML
+      const ironRich = this.currentSlot.dataset.ironRich === 'true'
+      const allergen = this.currentSlot.dataset.allergen === 'true'
+      
+      this.currentSlot.innerHTML = `
+        <div class="absolute top-0.5 right-0.5 flex gap-0.5">
+          ${ironRich ? '<span class="w-2 h-2 rounded-full bg-red-500" title="Iron Rich"></span>' : ''}
+          ${allergen ? '<span class="w-2 h-2 rounded-full bg-amber-400" title="Allergen"></span>' : ''}
+        </div>
+        <span class="meal-emoji text-xl mb-0.5">${newMealEmoji}</span>
+        <span class="meal-name text-[10px] text-gray-600 text-center leading-tight line-clamp-2">${newMealName.split(' ')[0]}</span>
+      `
+      
+      // Animate the change
+      this.currentSlot.classList.add('scale-110', 'bg-green-50')
+      setTimeout(() => {
+        this.currentSlot.classList.remove('scale-110', 'bg-green-50')
+      }, 300)
+      
+      this.showToast(`Swapped to ${newMealName}!`, newMealEmoji)
     }
     
-    this.closeSwapModal()
-    this.showSwapSuccess()
+    this.forceCloseSwapModal()
+    this.currentSlot = null
+  }
+
+  showToast(message, icon = '✓') {
+    // Remove existing toast
+    const existing = document.getElementById('meal-toast')
+    if (existing) existing.remove()
+    
+    const toast = document.createElement('div')
+    toast.id = 'meal-toast'
+    toast.className = 'fixed bottom-32 left-1/2 -translate-x-1/2 bg-[#4ECDC4] text-white pl-3 pr-4 py-2.5 rounded-full shadow-lg z-[100] flex items-center gap-2'
+    toast.innerHTML = `
+      <span class="text-lg">${icon}</span>
+      <span class="text-sm font-medium">${message}</span>
+    `
+    document.body.appendChild(toast)
+    
+    // Animate in
+    toast.style.transform = 'translate(-50%, 20px)'
+    toast.style.opacity = '0'
+    requestAnimationFrame(() => {
+      toast.style.transition = 'all 0.3s ease-out'
+      toast.style.transform = 'translate(-50%, 0)'
+      toast.style.opacity = '1'
+    })
+    
+    // Remove after delay
+    setTimeout(() => {
+      toast.style.transform = 'translate(-50%, 20px)'
+      toast.style.opacity = '0'
+      setTimeout(() => toast.remove(), 300)
+    }, 2000)
   }
 }
