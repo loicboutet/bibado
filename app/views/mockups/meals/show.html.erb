@@ -1,0 +1,228 @@
+<% content_for :title, "#{@meal[:name]} - Bibado" %>
+
+<!-- Meal Hero -->
+<div class="relative">
+  <div class="h-56 bg-gradient-to-br from-[#FFE66D]/30 to-[#FFE66D]/10 flex items-center justify-center">
+    <span class="text-8xl"><%= @meal[:emoji] %></span>
+  </div>
+  
+  <!-- Back button -->
+  <%= link_to mockups_meals_path, class: "absolute top-4 left-4 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg" do %>
+    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+  <% end %>
+  
+  <!-- Badges top left -->
+  <div class="absolute top-4 left-16 flex gap-2">
+    <% if @meal[:contains_gluten] %>
+      <span class="bg-white/90 rounded-full px-2 py-1 shadow-sm text-xs">🌾 Gluten</span>
+    <% end %>
+    <% if @meal[:is_vegetarian] %>
+      <span class="bg-white/90 rounded-full px-2 py-1 shadow-sm text-xs">🥬 Vegetarian</span>
+    <% end %>
+  </div>
+  
+  <!-- Heart/favorite -->
+  <div class="absolute top-4 right-4">
+    <button class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+      <% if @meal[:times_made] > 0 %>
+        <span class="text-[#FF6B6B] text-xl">❤️</span>
+      <% else %>
+        <span class="text-gray-400 text-xl">🤍</span>
+      <% end %>
+    </button>
+    <% if @meal[:times_made] > 0 %>
+      <span class="absolute -bottom-1 -right-1 bg-[#FF6B6B] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold"><%= @meal[:times_made] %></span>
+    <% end %>
+  </div>
+</div>
+
+<!-- Meal Info Card -->
+<div class="px-4 -mt-6 relative z-10">
+  <div class="bg-white rounded-xl shadow-lg p-4">
+    <h1 class="text-xl font-bold text-[#2C3E50]"><%= @meal[:name] %></h1>
+    <p class="text-gray-500 text-sm"><%= @meal[:meal_type] %></p>
+    
+    <!-- Key Info Grid -->
+    <div class="grid grid-cols-4 gap-2 mt-4">
+      <div class="text-center p-2 bg-gray-50 rounded-lg">
+        <p class="text-lg font-semibold text-[#2C3E50]"><%= @meal[:age_months] %>+</p>
+        <p class="text-xs text-gray-500">months</p>
+      </div>
+      <div class="text-center p-2 bg-gray-50 rounded-lg">
+        <p class="text-lg font-semibold text-[#2C3E50]"><%= @meal[:prep_time] %></p>
+        <p class="text-xs text-gray-500">minutes</p>
+      </div>
+      <div class="text-center p-2 bg-gray-50 rounded-lg">
+        <p class="text-lg font-semibold text-[#2C3E50]"><%= @meal[:portions] %></p>
+        <p class="text-xs text-gray-500">portions</p>
+      </div>
+      <div class="text-center p-2 rounded-lg
+                  <%= @meal[:skill_level] == 'Easy' ? 'bg-green-50' : 
+                      @meal[:skill_level] == 'Medium' ? 'bg-yellow-50' : 'bg-red-50' %>">
+        <p class="text-lg font-semibold 
+                  <%= @meal[:skill_level] == 'Easy' ? 'text-green-700' : 
+                      @meal[:skill_level] == 'Medium' ? 'text-yellow-700' : 'text-red-700' %>">
+          <%= @meal[:skill_level][0] %>
+        </p>
+        <p class="text-xs text-gray-500">skill</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="px-4 mt-4">
+  <div class="flex bg-gray-100 rounded-xl p-1">
+    <button onclick="showMealTab('ingredients')" 
+            class="meal-tab flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+            data-tab="ingredients">
+      Ingredients
+    </button>
+    <button onclick="showMealTab('instructions')" 
+            class="meal-tab flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+            data-tab="instructions">
+      Instructions
+    </button>
+  </div>
+</div>
+
+<!-- Tab Content -->
+<div class="px-4 mt-4">
+  <!-- Ingredients Tab -->
+  <div id="meal-tab-ingredients" class="meal-tab-content">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-semibold text-[#2C3E50]">Ingredients</h3>
+        <span class="text-sm text-gray-500"><%= @ingredients.count %> items</span>
+      </div>
+      
+      <!-- Simple version label -->
+      <div class="mb-4 p-3 bg-[#4ECDC4]/10 rounded-lg">
+        <p class="text-sm text-[#2C3E50] font-medium">🎯 5-ingredient, 5-minute version</p>
+        <p class="text-xs text-gray-600 mt-1">Simple and quick for busy parents!</p>
+      </div>
+      
+      <ul class="space-y-3">
+        <% @ingredients.each do |ing| %>
+          <li class="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+            <%= link_to mockups_food_path(ing[:food_id]), class: "flex items-center gap-3 flex-1" do %>
+              <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                <span class="text-lg"><%= ing[:emoji] %></span>
+              </div>
+              <div class="flex-1">
+                <p class="font-medium text-[#2C3E50] text-sm"><%= ing[:name] %></p>
+                <p class="text-xs text-gray-500"><%= ing[:quantity] %></p>
+              </div>
+              <% if ing[:is_optional] %>
+                <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded">optional</span>
+              <% end %>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      
+      <!-- Enhancement section -->
+      <div class="mt-4 p-3 bg-purple-50 rounded-lg">
+        <p class="text-sm text-purple-800 font-medium">✨ Want to enhance it?</p>
+        <p class="text-xs text-purple-600 mt-1">Add a pinch of cinnamon or a drizzle of nut butter for extra flavor and nutrition!</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Instructions Tab -->
+  <div id="meal-tab-instructions" class="meal-tab-content hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <h3 class="font-semibold text-[#2C3E50] mb-4">Instructions</h3>
+      
+      <ol class="space-y-4">
+        <% [
+          'Gather all your ingredients and prepare your workspace.',
+          'Prepare the main ingredient by washing and peeling if necessary.',
+          'Cook according to your baby\'s texture stage (mash, puree, or soft pieces).',
+          'Allow to cool to a safe temperature before serving.',
+          'Store any leftovers in an airtight container in the fridge for up to 3 days.'
+        ].each_with_index do |step, idx| %>
+          <li class="flex gap-3">
+            <div class="w-7 h-7 bg-[#FF6B6B] text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-medium">
+              <%= idx + 1 %>
+            </div>
+            <div class="flex-1 pt-1">
+              <p class="text-sm text-gray-700"><%= step %></p>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+      
+      <!-- Tips section -->
+      <div class="mt-6 p-3 bg-[#FFE66D]/20 rounded-lg">
+        <p class="text-sm text-[#2C3E50] font-medium">💡 Pro Tips</p>
+        <ul class="mt-2 space-y-1 text-xs text-gray-600">
+          <li>• Make extra and freeze in ice cube trays for easy portions</li>
+          <li>• Test temperature on your wrist before serving</li>
+          <li>• Let baby explore the texture with their hands</li>
+        </ul>
+      </div>
+      
+      <!-- Video placeholder -->
+      <div class="mt-4">
+        <div class="bg-gray-100 rounded-xl h-40 flex items-center justify-center">
+          <div class="text-center">
+            <div class="w-12 h-12 bg-[#FF6B6B] rounded-full flex items-center justify-center mx-auto mb-2">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-600">Watch preparation video</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Foods in this recipe -->
+<div class="px-4 mt-6 pb-6">
+  <h3 class="font-semibold text-[#2C3E50] mb-3">Foods in this recipe</h3>
+  <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+    <% @ingredients.reject { |i| i[:is_optional] }.each do |ing| %>
+      <%= link_to mockups_food_path(ing[:food_id]), class: "flex-shrink-0" do %>
+        <div class="w-16 text-center">
+          <div class="w-14 h-14 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-1">
+            <span class="text-2xl"><%= ing[:emoji] %></span>
+          </div>
+          <p class="text-xs text-gray-600 truncate"><%= ing[:name] %></p>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+// Initialize tab
+document.addEventListener('DOMContentLoaded', function() {
+  showMealTab('ingredients');
+});
+
+function showMealTab(tab) {
+  // Hide all tab contents
+  document.querySelectorAll('.meal-tab-content').forEach(el => el.classList.add('hidden'));
+  // Show selected tab content
+  document.getElementById('meal-tab-' + tab).classList.remove('hidden');
+  
+  // Update tab buttons
+  document.querySelectorAll('.meal-tab').forEach(btn => {
+    if (btn.dataset.tab === tab) {
+      btn.classList.add('bg-white', 'shadow-sm', 'text-[#2C3E50]');
+      btn.classList.remove('text-gray-500');
+    } else {
+      btn.classList.remove('bg-white', 'shadow-sm', 'text-[#2C3E50]');
+      btn.classList.add('text-gray-500');
+    }
+  });
+}
+</script>

@@ -1,0 +1,152 @@
+<% content_for :title do %>Home - Bibado<% end %>
+
+<!-- Welcome Section -->
+<div class="bg-gradient-to-br from-[#FF6B6B] to-[#E85555] text-white px-4 py-6">
+  <h1 class="text-xl font-bold mb-1">Good morning! 👋</h1>
+  <p class="text-white/90">Just starting to wean <%= baby_name %>?</p>
+  <p class="text-sm text-white/70 mt-1">Day <%= weaning_day %> of your weaning journey</p>
+</div>
+
+<!-- Tip of the Day -->
+<div class="mx-4 -mt-4 bg-white rounded-xl shadow-lg p-4 relative z-10">
+  <div class="flex items-start gap-3">
+    <div class="w-10 h-10 bg-[#FFE66D] rounded-full flex items-center justify-center flex-shrink-0">
+      <svg class="w-5 h-5 text-[#2C3E50]" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+      </svg>
+    </div>
+    <div>
+      <p class="font-semibold text-sm text-[#2C3E50]">Tip of the Day</p>
+      <p class="text-gray-600 text-sm mt-1"><%= @tip_of_day %></p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="px-4 mt-6">
+  <h2 class="font-semibold text-[#2C3E50] mb-3">Quick Actions</h2>
+  <div class="grid grid-cols-2 gap-3">
+    <%= link_to mockups_meal_plan_path, class: "bg-[#4ECDC4]/10 rounded-xl p-4 flex flex-col items-center text-center hover:bg-[#4ECDC4]/20 transition-colors" do %>
+      <div class="w-12 h-12 bg-[#4ECDC4] rounded-full flex items-center justify-center mb-2">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <span class="text-sm font-medium text-[#2C3E50]">Today's Plan</span>
+    <% end %>
+    
+    <%= link_to feedback_mockups_meal_plan_path, class: "bg-[#FF6B6B]/10 rounded-xl p-4 flex flex-col items-center text-center hover:bg-[#FF6B6B]/20 transition-colors" do %>
+      <div class="w-12 h-12 bg-[#FF6B6B] rounded-full flex items-center justify-center mb-2">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <span class="text-sm font-medium text-[#2C3E50]">Log Meal</span>
+    <% end %>
+    
+    <%= link_to mockups_foods_path, class: "bg-[#FFE66D]/30 rounded-xl p-4 flex flex-col items-center text-center hover:bg-[#FFE66D]/50 transition-colors" do %>
+      <div class="w-12 h-12 bg-[#FFE66D] rounded-full flex items-center justify-center mb-2">
+        <svg class="w-6 h-6 text-[#2C3E50]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <span class="text-sm font-medium text-[#2C3E50]">Find Foods</span>
+    <% end %>
+    
+    <%= link_to mockups_rewards_path, class: "bg-purple-100 rounded-xl p-4 flex flex-col items-center text-center hover:bg-purple-200 transition-colors" do %>
+      <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mb-2">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+        </svg>
+      </div>
+      <span class="text-sm font-medium text-[#2C3E50]">Weaning Wings</span>
+    <% end %>
+  </div>
+</div>
+
+<!-- Today's Meals -->
+<div class="px-4 mt-6">
+  <div class="flex justify-between items-center mb-3">
+    <h2 class="font-semibold text-[#2C3E50]">Today's Meals</h2>
+    <%= link_to "View Plan →", mockups_meal_plan_path, class: "text-[#FF6B6B] text-sm font-medium" %>
+  </div>
+  
+  <div class="space-y-3">
+    <% @upcoming_meals.each do |meal| %>
+      <%= link_to mockups_meal_path(meal[:id]), class: "block bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow" do %>
+        <div class="flex items-center gap-3">
+          <div class="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="font-medium text-[#2C3E50]"><%= meal[:name] %></p>
+            <p class="text-sm text-gray-500"><%= meal[:meal] %></p>
+            <p class="text-xs text-gray-400 mt-1"><%= meal[:time] %></p>
+          </div>
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Recent Foods -->
+<div class="px-4 mt-6 mb-6">
+  <div class="flex justify-between items-center mb-3">
+    <h2 class="font-semibold text-[#2C3E50]">Recent Foods</h2>
+    <%= link_to "See All →", mockups_foods_path, class: "text-[#FF6B6B] text-sm font-medium" %>
+  </div>
+  
+  <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+    <% @recent_foods.each do |food| %>
+      <%= link_to mockups_food_path(food[:id]), class: "flex-shrink-0 w-24" do %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center hover:shadow-md transition-shadow">
+          <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-2">
+            <span class="text-2xl"><%= food[:emoji] || '🍽️' %></span>
+          </div>
+          <p class="text-xs font-medium text-[#2C3E50] truncate"><%= food[:name] %></p>
+          <div class="flex items-center justify-center gap-1 mt-1">
+            <span class="text-xs text-gray-500"><%= food[:exposure_count] %>/15</span>
+            <div class="w-8 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-[#4ECDC4] rounded-full" style="width: <%= (food[:exposure_count] / 15.0 * 100).to_i %>%"></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Video Guides Section -->
+<div class="px-4 pb-6">
+  <div class="flex justify-between items-center mb-3">
+    <h2 class="font-semibold text-[#2C3E50]">Video Guides</h2>
+    <%= link_to "View All →", mockups_guides_path, class: "text-[#FF6B6B] text-sm font-medium" %>
+  </div>
+  
+  <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+    <% [
+      { id: 1, title: 'Getting Started', duration: '5 min' },
+      { id: 2, title: 'First Foods Guide', duration: '8 min' },
+      { id: 3, title: 'Safety Tips', duration: '4 min' }
+    ].each do |guide| %>
+      <%= link_to mockups_guide_path(guide[:id]), class: "flex-shrink-0 w-40" do %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div class="h-24 bg-gradient-to-br from-[#4ECDC4] to-[#3DB9B0] flex items-center justify-center">
+            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+          <div class="p-3">
+            <p class="text-sm font-medium text-[#2C3E50] truncate"><%= guide[:title] %></p>
+            <p class="text-xs text-gray-500"><%= guide[:duration] %></p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,123 @@
+<% content_for :title, "Meals Database - Bibado" %>
+
+<!-- Search Bar -->
+<div class="px-4 py-3 bg-gray-50">
+  <form action="<%= search_mockups_meals_path %>" method="get" class="relative">
+    <input type="text" name="q" placeholder="Search meals..." 
+           class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/20 outline-none transition-all"
+           value="<%= params[:q] %>">
+    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    </svg>
+  </form>
+</div>
+
+<!-- Categories -->
+<div class="px-4 py-4">
+  <h2 class="font-semibold text-[#2C3E50] mb-3">Meal Types</h2>
+  <div class="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+    <%= link_to mockups_meals_path, class: "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors #{@filter.blank? ? 'bg-[#FF6B6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" do %>
+      All
+    <% end %>
+    <% @categories.each do |cat| %>
+      <%= link_to mockups_meals_path(category: cat[:name].downcase), 
+          class: "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1 #{@filter == cat[:name].downcase ? 'bg-[#FF6B6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" do %>
+        <span><%= cat[:icon] %></span>
+        <span><%= cat[:name] %></span>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Filter Pills -->
+<div class="px-4 pb-3">
+  <div class="flex gap-2 overflow-x-auto scrollbar-hide">
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+      🥬 Vegetarian
+    </button>
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+      🌱 Vegan
+    </button>
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+      🌾 Gluten-Free
+    </button>
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+      ⏱️ Under 10 min
+    </button>
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+      👶 6+ months
+    </button>
+  </div>
+</div>
+
+<!-- Meals List -->
+<div class="px-4 pb-6">
+  <p class="text-sm text-gray-500 mb-3"><%= @meals.count %> meals found</p>
+  
+  <div class="space-y-3">
+    <% @meals.each do |meal| %>
+      <%= link_to mockups_meal_path(meal[:id]), class: "block" do %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div class="flex">
+            <!-- Meal Image -->
+            <div class="w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center flex-shrink-0 relative">
+              <span class="text-4xl"><%= meal[:emoji] %></span>
+              
+              <!-- Times made badge -->
+              <% if meal[:times_made] > 0 %>
+                <div class="absolute top-2 right-2 bg-[#FF6B6B] text-white rounded-full w-5 h-5 flex items-center justify-center">
+                  <span class="text-xs font-bold"><%= meal[:times_made] %></span>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Meal Info -->
+            <div class="flex-1 p-3">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="font-medium text-[#2C3E50] text-sm"><%= meal[:name] %></h3>
+                  <p class="text-xs text-gray-500"><%= meal[:meal_type] %></p>
+                </div>
+              </div>
+              
+              <!-- Badges row -->
+              <div class="flex flex-wrap gap-1 mt-2">
+                <% if meal[:contains_gluten] %>
+                  <span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded">🌾</span>
+                <% end %>
+                <% if meal[:is_vegetarian] %>
+                  <span class="text-xs px-1.5 py-0.5 bg-green-50 text-green-700 rounded">🥬</span>
+                <% end %>
+                <% if meal[:is_vegan] %>
+                  <span class="text-xs px-1.5 py-0.5 bg-green-50 text-green-700 rounded">🌱</span>
+                <% end %>
+              </div>
+              
+              <!-- Info row -->
+              <div class="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                <span class="flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <%= meal[:prep_time] %> min
+                </span>
+                <span class="flex items-center gap-1">
+                  👶 <%= meal[:age_months] %>+ mo
+                </span>
+                <span class="flex items-center gap-1">
+                  🍽️ <%= meal[:portions] %>
+                </span>
+                <span class="px-1.5 py-0.5 rounded text-xs
+                       <%= meal[:skill_level] == 'Easy' ? 'bg-green-100 text-green-700' : 
+                           meal[:skill_level] == 'Medium' ? 'bg-yellow-100 text-yellow-700' : 
+                           'bg-red-100 text-red-700' %>">
+                  <%= meal[:skill_level] %>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

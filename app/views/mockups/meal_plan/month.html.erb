@@ -1,0 +1,84 @@
+<% content_for :title, "Month View - Bibado" %>
+
+<!-- Header with view toggle -->
+<div class="bg-white border-b border-gray-200 px-4 py-3">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button class="p-1 hover:bg-gray-100 rounded">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="font-semibold text-[#2C3E50]"><%= Date.today.strftime('%B %Y') %></h1>
+      <button class="p-1 hover:bg-gray-100 rounded">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="flex bg-gray-100 rounded-lg p-0.5">
+      <%= link_to day_mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded text-gray-500" do %>D<% end %>
+      <%= link_to mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded text-gray-500" do %>W<% end %>
+      <%= link_to month_mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded bg-white shadow-sm text-[#2C3E50]" do %>M<% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Month Calendar Grid -->
+<div class="px-4 py-4">
+  <!-- Day headers -->
+  <div class="grid grid-cols-7 gap-1 mb-2">
+    <% %w[S M T W T F S].each do |day| %>
+      <div class="text-center text-xs font-medium text-gray-500 py-2"><%= day %></div>
+    <% end %>
+  </div>
+  
+  <!-- Calendar grid -->
+  <div class="grid grid-cols-7 gap-1">
+    <% # Padding for start of month %>
+    <% Date.today.beginning_of_month.wday.times do %>
+      <div class="aspect-square"></div>
+    <% end %>
+    
+    <% @month_data.each do |day_data| %>
+      <%= link_to day_mockups_meal_plan_path(date: day_data[:date]), class: "aspect-square" do %>
+        <div class="h-full bg-white rounded-lg border <%= day_data[:date] == Date.today ? 'border-[#FF6B6B] border-2' : 'border-gray-100' %> p-1 hover:shadow-md transition-shadow">
+          <span class="text-xs font-medium <%= day_data[:date] == Date.today ? 'text-[#FF6B6B]' : 'text-gray-600' %>">
+            <%= day_data[:date].day %>
+          </span>
+          
+          <% if day_data[:has_meals] %>
+            <!-- Meal indicators -->
+            <div class="flex flex-col gap-0.5 mt-1">
+              <% day_data[:meal_indicators].each_with_index do |has_meal, idx| %>
+                <div class="h-1 rounded-full <%= has_meal ? (idx == 2 ? 'bg-[#4ECDC4]' : 'bg-[#FF6B6B]') : 'bg-transparent' %>"></div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="px-4 pb-6">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+    <h3 class="font-semibold text-[#2C3E50] text-sm mb-3">Legend</h3>
+    <div class="flex flex-wrap gap-4 text-xs">
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-1 bg-[#FF6B6B] rounded-full"></div>
+        <span class="text-gray-600">Meal planned</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-1 bg-[#4ECDC4] rounded-full"></div>
+        <span class="text-gray-600">Iron-rich</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-1 bg-amber-400 rounded-full"></div>
+        <span class="text-gray-600">Allergen</span>
+      </div>
+    </div>
+  </div>
+</div>

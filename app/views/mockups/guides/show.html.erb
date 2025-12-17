@@ -1,0 +1,52 @@
+<% content_for :title, "#{@guide[:title]} - Bibado" %>
+
+<!-- Video Player -->
+<div class="relative">
+  <div class="aspect-video bg-gradient-to-br from-[#4ECDC4] to-[#3DB9B0] flex items-center justify-center">
+    <span class="text-6xl"><%= @guide[:thumbnail] %></span>
+    <div class="absolute inset-0 flex items-center justify-center">
+      <button class="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors">
+        <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+  <%= link_to mockups_guides_path, class: "absolute top-4 left-4 w-10 h-10 bg-black/30 rounded-full flex items-center justify-center" do %>
+    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+  <% end %>
+</div>
+
+<!-- Video Info -->
+<div class="px-4 py-4">
+  <h1 class="text-xl font-bold text-[#2C3E50]"><%= @guide[:title] %></h1>
+  <div class="flex items-center gap-3 mt-2 text-sm text-gray-500">
+    <span><%= @guide[:duration] %> min</span>
+    <span>•</span>
+    <span><%= @guide[:category].titleize.gsub('_', ' ') %></span>
+  </div>
+  <p class="mt-3 text-gray-600"><%= @guide[:description] %></p>
+</div>
+
+<!-- Related Videos -->
+<div class="px-4 pb-6">
+  <h2 class="font-semibold text-[#2C3E50] mb-3">Related Videos</h2>
+  <div class="space-y-3">
+    <% @related_guides.each do |guide| %>
+      <%= link_to mockups_guide_path(guide[:id]), class: "block" do %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex hover:shadow-md transition-shadow">
+          <div class="w-24 h-16 bg-gradient-to-br from-[#4ECDC4] to-[#3DB9B0] flex items-center justify-center">
+            <span class="text-2xl"><%= guide[:thumbnail] %></span>
+          </div>
+          <div class="flex-1 p-2">
+            <p class="font-medium text-[#2C3E50] text-sm line-clamp-1"><%= guide[:title] %></p>
+            <p class="text-xs text-gray-500"><%= guide[:duration] %> min</p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

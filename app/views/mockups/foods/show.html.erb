@@ -1,0 +1,371 @@
+<% content_for :title, "#{@food[:name]} - Bibado" %>
+
+<!-- Food Hero -->
+<div class="relative">
+  <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+    <span class="text-7xl"><%= @food[:emoji] %></span>
+  </div>
+  
+  <!-- Back button -->
+  <%= link_to mockups_foods_path, class: "absolute top-4 left-4 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg" do %>
+    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+  <% end %>
+  
+  <!-- Last tried date -->
+  <div class="absolute top-4 left-16 bg-white/90 rounded-full px-3 py-1 shadow-sm">
+    <span class="text-xs text-gray-600">Last tried: <%= @food[:last_tried]&.strftime('%b %d') || 'Never' %></span>
+  </div>
+  
+  <!-- Exposure counter -->
+  <div class="absolute top-4 right-4 bg-white/90 rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1">
+    <span class="text-lg">🍎</span>
+    <span class="font-semibold text-[#2C3E50]"><%= @food[:exposure_count] %></span>
+  </div>
+</div>
+
+<!-- Food Info -->
+<div class="px-4 -mt-6 relative z-10">
+  <div class="bg-white rounded-xl shadow-lg p-4">
+    <h1 class="text-xl font-bold text-[#2C3E50]"><%= @food[:name] %></h1>
+    <p class="text-gray-500 text-sm"><%= @food[:category] %></p>
+    
+    <!-- Info badges -->
+    <div class="flex flex-wrap gap-2 mt-3">
+      <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+        <%= @food[:age_months] %>+ months
+      </span>
+      
+      <% if @food[:is_allergen] %>
+        <span class="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 rounded-full text-xs">
+          ⚠️ Allergen (<%= @food[:allergen_type] %>)
+        </span>
+      <% end %>
+      
+      <% if @food[:is_iron_rich] %>
+        <span class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs">
+          🔴 Iron Rich (<%= @food[:iron_type] %>)
+        </span>
+      <% end %>
+      
+      <% if @food[:is_vitamin_c] %>
+        <span class="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-full text-xs">
+          🍊 Vitamin C
+        </span>
+      <% end %>
+      
+      <% if @food[:is_choking_hazard] %>
+        <span class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs">
+          ⚠️ Choking Hazard
+        </span>
+      <% end %>
+      
+      <span class="inline-flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs">
+        ✨ Milestone Magic
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="px-4 mt-4" data-controller="tabs">
+  <div class="grid grid-cols-4 gap-2">
+    <% ['nutrition', 'serve', 'progress', 'faqs'].each do |tab| %>
+      <button data-tabs-target="tab" data-tab="<%= tab %>" 
+              class="tab-btn py-3 px-2 rounded-xl text-center transition-all text-xs font-medium
+                     <%= @active_tab == tab ? 'bg-[#FF6B6B] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>"
+              onclick="activateTab('<%= tab %>')">
+        <% case tab %>
+        <% when 'nutrition' %>
+          <span class="block text-lg mb-1">🥗</span>
+          Nutrition
+        <% when 'serve' %>
+          <span class="block text-lg mb-1">🍽️</span>
+          How to Serve
+        <% when 'progress' %>
+          <span class="block text-lg mb-1">📊</span>
+          Progress
+        <% when 'faqs' %>
+          <span class="block text-lg mb-1">❓</span>
+          FAQs
+        <% end %>
+      </button>
+    <% end %>
+  </div>
+  
+  <!-- Tab Content -->
+  <div class="mt-4">
+    <!-- Nutrition Tab -->
+    <div id="tab-nutrition" class="tab-content <%= @active_tab == 'nutrition' ? '' : 'hidden' %>">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <h3 class="font-semibold text-[#2C3E50] mb-3">Nutrition Information</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          <%= @food[:name] %> is an excellent source of nutrients for your weaning baby.
+        </p>
+        
+        <div class="space-y-3">
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-sm text-gray-600">Calories</span>
+            <span class="font-medium text-[#2C3E50]">80 kcal / 100g</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-sm text-gray-600">Protein</span>
+            <span class="font-medium text-[#2C3E50]">1g</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-sm text-gray-600">Carbohydrates</span>
+            <span class="font-medium text-[#2C3E50]">9g</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-sm text-gray-600">Fat</span>
+            <span class="font-medium text-[#2C3E50]">7g (healthy fats)</span>
+          </div>
+          <div class="flex justify-between items-center py-2">
+            <span class="text-sm text-gray-600">Fiber</span>
+            <span class="font-medium text-[#2C3E50]">3g</span>
+          </div>
+        </div>
+        
+        <div class="mt-4 p-3 bg-[#4ECDC4]/10 rounded-lg">
+          <p class="text-sm text-[#2C3E50]">
+            <strong>Key Benefits:</strong> <%= @food[:name] %> supports healthy brain development and provides essential vitamins for growing babies.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- How to Serve Tab -->
+    <div id="tab-serve" class="tab-content <%= @active_tab == 'serve' ? '' : 'hidden' %>">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <h3 class="font-semibold text-[#2C3E50] mb-3">How to Serve <%= @food[:name] %></h3>
+        
+        <!-- Age Selector -->
+        <div class="flex gap-2 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-hide">
+          <% @serving_guides.keys.each_with_index do |age, idx| %>
+            <button onclick="showAgeGuide('<%= idx %>')" 
+                    class="age-btn flex-shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-colors
+                           <%= idx == 0 ? 'bg-[#FF6B6B] text-white' : 'bg-gray-100 text-gray-600' %>"
+                    data-age="<%= idx %>">
+              <%= age %>
+            </button>
+          <% end %>
+        </div>
+        
+        <!-- Serving Guides -->
+        <% @serving_guides.each_with_index do |(age, guide), idx| %>
+          <div class="age-guide <%= idx == 0 ? '' : 'hidden' %>" data-guide="<%= idx %>">
+            <div class="mt-3 p-4 bg-gray-50 rounded-xl">
+              <p class="text-sm text-gray-700 mb-3"><%= guide[:description] %></p>
+              
+              <h4 class="font-medium text-[#2C3E50] text-sm mb-2">Tips:</h4>
+              <ul class="space-y-2">
+                <% guide[:tips].each do |tip| %>
+                  <li class="flex items-start gap-2 text-sm text-gray-600">
+                    <span class="text-[#4ECDC4]">✓</span>
+                    <%= tip %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+            
+            <!-- Serving images placeholder -->
+            <div class="mt-4">
+              <h4 class="font-medium text-[#2C3E50] text-sm mb-2">Serving Suggestions</h4>
+              <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <% ['Puree', 'Mash', 'Strips', 'Chunks'].each do |style| %>
+                  <div class="flex-shrink-0 w-20 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center mb-1">
+                      <span class="text-2xl"><%= @food[:emoji] %></span>
+                    </div>
+                    <span class="text-xs text-gray-600"><%= style %></span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            
+            <!-- Video placeholder -->
+            <div class="mt-4">
+              <div class="bg-gray-100 rounded-xl h-40 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="w-12 h-12 bg-[#FF6B6B] rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                  <p class="text-sm text-gray-600">How to serve <%= @food[:name].downcase %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Progress Tab -->
+    <div id="tab-progress" class="tab-content <%= @active_tab == 'progress' ? '' : 'hidden' %>">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <h3 class="font-semibold text-[#2C3E50] mb-3">Tracking Progress</h3>
+        
+        <!-- Exposure counter -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-600 mb-2">Total Exposures</p>
+          <div class="flex gap-1">
+            <% 15.times do |i| %>
+              <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs
+                          <%= i < @food[:exposure_count] ? 'bg-[#FF6B6B] text-white' : 'bg-gray-200 text-gray-400' %>">
+                🍎
+              </div>
+            <% end %>
+          </div>
+          <p class="text-xs text-gray-500 mt-1"><%= @food[:exposure_count] %>/15 exposures</p>
+        </div>
+        
+        <!-- Interaction Tracker -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-600 mb-2">Interaction Progress</p>
+          <div class="space-y-2">
+            <% [
+              { level: 'Saw', progress: 100 },
+              { level: 'Smelt', progress: 90 },
+              { level: 'Touched', progress: 80 },
+              { level: 'Tasted', progress: 60 },
+              { level: 'Chewed', progress: 40 },
+              { level: 'Swallowed', progress: 30 }
+            ].each do |interaction| %>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-600 w-20"><%= interaction[:level] %></span>
+                <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-[#4ECDC4] rounded-full" style="width: <%= interaction[:progress] %>%"></div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Texture Progress -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-600 mb-2">Texture Progression</p>
+          <div class="grid grid-cols-4 gap-2">
+            <% ['Puree', 'Mash', 'Soft Pieces', 'Regular'].each_with_index do |texture, idx| %>
+              <div class="text-center p-2 rounded-lg <%= idx < 2 ? 'bg-[#4ECDC4]/20' : 'bg-gray-100' %>">
+                <div class="w-8 h-8 mx-auto rounded-full flex items-center justify-center mb-1
+                            <%= idx < 2 ? 'bg-[#4ECDC4] text-white' : 'bg-gray-300 text-white' %>">
+                  <%= idx < 2 ? '✓' : idx + 1 %>
+                </div>
+                <span class="text-xs text-gray-600"><%= texture %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Allergic Reactions -->
+        <div class="mb-4 p-3 bg-amber-50 rounded-lg">
+          <p class="text-sm font-medium text-amber-800 mb-2">Allergic Reactions</p>
+          <div class="flex flex-wrap gap-2">
+            <% ['Rash', 'Hives', 'Swelling', 'Vomiting', 'Diarrhea'].each do |reaction| %>
+              <label class="flex items-center gap-1.5">
+                <input type="checkbox" class="rounded border-gray-300 text-[#FF6B6B] focus:ring-[#FF6B6B]">
+                <span class="text-xs text-gray-600"><%= reaction %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Notes -->
+        <div>
+          <p class="text-sm text-gray-600 mb-2">Notes</p>
+          <button class="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#FF6B6B] hover:text-[#FF6B6B] transition-colors">
+            + Add your own note
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- FAQs Tab -->
+    <div id="tab-faqs" class="tab-content <%= @active_tab == 'faqs' ? '' : 'hidden' %>">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <h3 class="font-semibold text-[#2C3E50] mb-3">Frequently Asked Questions</h3>
+        
+        <div class="space-y-3">
+          <% [
+            { q: "When can I introduce #{@food[:name].downcase}?", a: "#{@food[:name]} can typically be introduced from #{@food[:age_months]} months as one of baby's first foods." },
+            { q: "Is #{@food[:name].downcase} a common allergen?", a: @food[:is_allergen] ? "Yes, #{@food[:name].downcase} is a common allergen. Introduce carefully and watch for reactions." : "No, #{@food[:name].downcase} is not a common allergen." },
+            { q: "How should I prepare #{@food[:name].downcase}?", a: "Always ensure #{@food[:name].downcase} is ripe and soft. Remove any skin or pits, and serve in an age-appropriate texture." },
+            { q: "How much should I offer?", a: "Start with 1-2 teaspoons and let baby guide how much they want. Follow their hunger cues." }
+          ].each do |faq| %>
+            <details class="group">
+              <summary class="flex justify-between items-center cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <span class="text-sm font-medium text-[#2C3E50] pr-4"><%= faq[:q] %></span>
+                <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </summary>
+              <div class="p-3 text-sm text-gray-600">
+                <%= faq[:a] %>
+              </div>
+            </details>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Related Meals Carousel -->
+<div class="px-4 mt-6 pb-6">
+  <h3 class="font-semibold text-[#2C3E50] mb-3">Meals with <%= @food[:name] %></h3>
+  <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+    <% @related_meals.each do |meal| %>
+      <%= link_to mockups_meal_path(meal[:id]), class: "flex-shrink-0 w-36" do %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div class="h-20 bg-gradient-to-br from-[#FFE66D]/30 to-[#FFE66D]/10 flex items-center justify-center">
+            <span class="text-3xl"><%= @food[:emoji] %></span>
+          </div>
+          <div class="p-2">
+            <p class="text-xs font-medium text-[#2C3E50] truncate"><%= meal[:name] %></p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+function activateTab(tab) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  // Show selected tab content
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+  
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    if (btn.dataset.tab === tab) {
+      btn.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+      btn.classList.add('bg-[#FF6B6B]', 'text-white', 'shadow-md');
+    } else {
+      btn.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+      btn.classList.remove('bg-[#FF6B6B]', 'text-white', 'shadow-md');
+    }
+  });
+}
+
+function showAgeGuide(idx) {
+  // Hide all age guides
+  document.querySelectorAll('.age-guide').forEach(el => el.classList.add('hidden'));
+  // Show selected age guide
+  document.querySelector('[data-guide="' + idx + '"]').classList.remove('hidden');
+  
+  // Update age buttons
+  document.querySelectorAll('.age-btn').forEach(btn => {
+    if (parseInt(btn.dataset.age) === idx) {
+      btn.classList.remove('bg-gray-100', 'text-gray-600');
+      btn.classList.add('bg-[#FF6B6B]', 'text-white');
+    } else {
+      btn.classList.add('bg-gray-100', 'text-gray-600');
+      btn.classList.remove('bg-[#FF6B6B]', 'text-white');
+    }
+  });
+}
+</script>

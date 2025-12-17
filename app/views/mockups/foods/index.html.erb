@@ -1,0 +1,103 @@
+<% content_for :title, "Foods Database - Bibado" %>
+
+<!-- Search Bar -->
+<div class="px-4 py-3 bg-gray-50">
+  <form action="<%= search_mockups_foods_path %>" method="get" class="relative">
+    <input type="text" name="q" placeholder="Search foods..." 
+           class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/20 outline-none transition-all"
+           value="<%= params[:q] %>">
+    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    </svg>
+  </form>
+</div>
+
+<!-- Categories -->
+<div class="px-4 py-4">
+  <h2 class="font-semibold text-[#2C3E50] mb-3">Categories</h2>
+  <div class="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+    <%= link_to mockups_foods_path, class: "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors #{@filter.blank? ? 'bg-[#FF6B6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" do %>
+      All
+    <% end %>
+    <% @categories.each do |cat| %>
+      <%= link_to mockups_foods_path(category: cat[:name].downcase.singularize), 
+          class: "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1 #{@filter == cat[:name].downcase.singularize ? 'bg-[#FF6B6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" do %>
+        <span><%= cat[:icon] %></span>
+        <span><%= cat[:name] %></span>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Filter Pills -->
+<div class="px-4 pb-3">
+  <div class="flex gap-2 overflow-x-auto scrollbar-hide">
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-[#4ECDC4]/10 text-[#4ECDC4] border border-[#4ECDC4]/30">
+      <span class="flex items-center gap-1">
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+        Iron Rich
+      </span>
+    </button>
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+      Vitamin C
+    </button>
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+      Allergens
+    </button>
+    <button class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+      Not Tried
+    </button>
+  </div>
+</div>
+
+<!-- Foods List -->
+<div class="px-4 pb-6">
+  <p class="text-sm text-gray-500 mb-3"><%= @foods.count %> foods found</p>
+  
+  <div class="grid grid-cols-2 gap-3">
+    <% @foods.each do |food| %>
+      <%= link_to mockups_food_path(food[:id]), class: "block" do %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <!-- Food Image/Emoji -->
+          <div class="h-24 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative">
+            <span class="text-4xl"><%= food[:emoji] %></span>
+            
+            <!-- Exposure counter badge -->
+            <div class="absolute top-2 right-2 bg-white rounded-full px-2 py-0.5 shadow-sm flex items-center gap-1">
+              <span class="text-xs">🍎</span>
+              <span class="text-xs font-medium text-gray-600"><%= food[:exposure_count] %></span>
+            </div>
+            
+            <!-- Badges -->
+            <div class="absolute bottom-2 left-2 flex gap-1">
+              <% if food[:is_allergen] %>
+                <span class="bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full">⚠️</span>
+              <% end %>
+              <% if food[:is_iron_rich] %>
+                <span class="bg-red-100 text-red-700 text-xs px-1.5 py-0.5 rounded-full">Fe</span>
+              <% end %>
+              <% if food[:is_vitamin_c] %>
+                <span class="bg-orange-100 text-orange-700 text-xs px-1.5 py-0.5 rounded-full">C</span>
+              <% end %>
+            </div>
+          </div>
+          
+          <!-- Food Info -->
+          <div class="p-3">
+            <p class="font-medium text-[#2C3E50] text-sm truncate"><%= food[:name] %></p>
+            <p class="text-xs text-gray-500"><%= food[:category] %></p>
+            
+            <!-- Progress bar -->
+            <div class="mt-2 flex items-center gap-2">
+              <div class="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-[#4ECDC4] rounded-full transition-all" 
+                     style="width: <%= (food[:exposure_count] / 15.0 * 100).to_i %>%"></div>
+              </div>
+              <span class="text-xs text-gray-500"><%= food[:exposure_count] %>/15</span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

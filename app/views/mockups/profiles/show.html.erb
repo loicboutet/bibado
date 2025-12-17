@@ -1,0 +1,79 @@
+<% content_for :title, "Profile - Bibado" %>
+
+<div class="px-4 py-4">
+  <!-- Profile Header -->
+  <div class="text-center mb-6">
+    <div class="w-20 h-20 mx-auto bg-[#FF6B6B] rounded-full flex items-center justify-center mb-3">
+      <span class="text-3xl text-white font-bold"><%= @user_name[0] %></span>
+    </div>
+    <h1 class="text-xl font-bold text-[#2C3E50]"><%= @user_name %></h1>
+    <p class="text-gray-500"><%= @email %></p>
+  </div>
+  
+  <!-- Baby Info -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="font-semibold text-[#2C3E50]">Baby Information</h2>
+      <button class="text-[#FF6B6B] text-sm font-medium">Edit</button>
+    </div>
+    <div class="space-y-3">
+      <div class="flex justify-between">
+        <span class="text-gray-500 text-sm">Name</span>
+        <span class="text-[#2C3E50] font-medium"><%= @baby[:name] %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-500 text-sm">Date of Birth</span>
+        <span class="text-[#2C3E50] font-medium"><%= @baby[:dob].strftime('%B %d, %Y') %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-500 text-sm">Weaning Started</span>
+        <span class="text-[#2C3E50] font-medium"><%= @baby[:weaning_start].strftime('%B %d, %Y') %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-500 text-sm">Weaning Day</span>
+        <span class="text-[#4ECDC4] font-medium">Day <%= weaning_day %></span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Quick Stats -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+    <h2 class="font-semibold text-[#2C3E50] mb-3">Weaning Stats</h2>
+    <div class="grid grid-cols-3 gap-4 text-center">
+      <div>
+        <p class="text-2xl font-bold text-[#FF6B6B]">24</p>
+        <p class="text-xs text-gray-500">Foods Tried</p>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-[#4ECDC4]">156</p>
+        <p class="text-xs text-gray-500">Meals Logged</p>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-purple-500">450</p>
+        <p class="text-xs text-gray-500">Points Earned</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Links -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-100">
+    <%= link_to mockups_settings_path, class: "flex items-center justify-between p-4 hover:bg-gray-50" do %>
+      <span class="text-[#2C3E50]">Settings</span>
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    <% end %>
+    <a href="#" class="flex items-center justify-between p-4 hover:bg-gray-50">
+      <span class="text-[#2C3E50]">Help & Support</span>
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+    <a href="#" class="flex items-center justify-between p-4 hover:bg-gray-50">
+      <span class="text-[#FF6B6B]">Sign Out</span>
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+    </a>
+  </div>
+</div>

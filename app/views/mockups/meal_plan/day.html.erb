@@ -1,0 +1,103 @@
+<% content_for :title, "Day View - Bibado" %>
+
+<!-- Header with view toggle -->
+<div class="bg-white border-b border-gray-200 px-4 py-3">
+  <div class="flex items-center justify-between">
+    <!-- Navigation arrows and title -->
+    <div class="flex items-center gap-3">
+      <button class="p-1 hover:bg-gray-100 rounded">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="font-semibold text-[#2C3E50]"><%= @date.strftime('%A, %B %d') %></h1>
+      <button class="p-1 hover:bg-gray-100 rounded">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- View toggle -->
+    <div class="flex bg-gray-100 rounded-lg p-0.5">
+      <%= link_to day_mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded bg-white shadow-sm text-[#2C3E50]" do %>D<% end %>
+      <%= link_to mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded text-gray-500" do %>W<% end %>
+      <%= link_to month_mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded text-gray-500" do %>M<% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Day Meals List -->
+<div class="px-4 py-4 space-y-4">
+  <% @day_meals.each do |slot_data| %>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <!-- Slot Header -->
+      <div class="bg-gray-50 px-4 py-2 border-b border-gray-100">
+        <div class="flex justify-between items-center">
+          <h3 class="font-medium text-[#2C3E50] text-sm"><%= slot_data[:slot] %></h3>
+          <span class="text-xs text-gray-500"><%= slot_data[:time] %></span>
+        </div>
+      </div>
+      
+      <!-- Meal Content -->
+      <% if slot_data[:meal] %>
+        <%= link_to mockups_meal_path(slot_data[:meal][:id]), class: "block p-4 hover:bg-gray-50 transition-colors" do %>
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl flex items-center justify-center">
+              <span class="text-3xl"><%= slot_data[:meal][:emoji] %></span>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-[#2C3E50]"><%= slot_data[:meal][:name] %></p>
+              <p class="text-sm text-gray-500">Tap to view recipe</p>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button class="text-gray-400 hover:text-[#FF6B6B] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+              </button>
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="p-4">
+          <button class="w-full py-6 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 hover:border-[#FF6B6B] hover:text-[#FF6B6B] transition-colors flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="text-sm font-medium">Add meal</span>
+          </button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Foods for Today -->
+<div class="px-4 pb-6">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+    <h3 class="font-semibold text-[#2C3E50] text-sm mb-3">Foods in today's plan</h3>
+    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <% @foods_tried.each do |food| %>
+        <div class="flex-shrink-0 text-center">
+          <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1">
+            <span class="text-xl"><%= food[:emoji] %></span>
+          </div>
+          <p class="text-xs text-gray-600"><%= food[:name] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Log Meal FAB -->
+<div class="fixed bottom-24 right-4 sm:right-auto sm:left-1/2 sm:translate-x-[130px] z-30">
+  <%= link_to feedback_mockups_meal_plan_path, class: "w-14 h-14 bg-[#FF6B6B] rounded-full shadow-lg flex items-center justify-center hover:bg-[#E85555] transition-colors" do %>
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+  <% end %>
+</div>
