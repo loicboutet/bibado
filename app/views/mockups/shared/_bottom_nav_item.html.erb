@@ -2,28 +2,45 @@
 <%# locals: icon, label, path, active %>
 <% active_class = active ? 'text-bibado-coral' : 'text-gray-500' %>
 
-<%= link_to path, class: "flex flex-col items-center gap-1 px-3 py-1 #{active_class}", data: local_assigns[:data] do %>
+<%= link_to path, class: "flex flex-col items-center gap-0.5 px-2 py-1 #{active_class}", data: local_assigns[:data] do %>
   <% case icon %>
-  <% when 'home' %>
-    <svg class="w-6 h-6" fill="<%= active ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
+  <% when 'today', 'home' %>
+    <svg class="w-5 h-5" fill="<%= active ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
     </svg>
-  <% when 'foods' %>
-    <svg class="w-6 h-6" fill="<%= active ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z"/>
+  <% when 'search' %>
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
     </svg>
   <% when 'meals' %>
-    <svg class="w-6 h-6" fill="<%= active ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+    <!-- Plate with utensils icon -->
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8" stroke-width="2"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h8"/>
+    </svg>
+  <% when 'tracker' %>
+    <!-- Chart/tracker icon -->
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+    </svg>
+  <% when 'foods' %>
+    <!-- Broccoli/veggie icon -->
+    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 22V14M12 14C12 14 8 14 6 11C4 8 6 4 10 4C10 4 10 2 12 2C14 2 14 4 14 4C18 4 20 8 18 11C16 14 12 14 12 14Z"/>
+    </svg>
+  <% when 'wings', 'weaning_wings' %>
+    <!-- Wings/feather icon -->
+    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
     </svg>
   <% when 'plan' %>
-    <svg class="w-6 h-6" fill="<%= active ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-5 h-5" fill="<%= active ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
     </svg>
   <% when 'more' %>
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/>
     </svg>
   <% end %>
-  <span class="text-xs font-medium"><%= label %></span>
+  <span class="text-[10px] font-medium"><%= label %></span>
 <% end %>

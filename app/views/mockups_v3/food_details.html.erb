@@ -1,0 +1,612 @@
+<% content_for :custom_header do %>
+    <header class="top-header">
+        <button class="back-btn" onclick="history.back()" aria-label="Go back">←</button>
+        <h1>Avocado</h1>
+        <button class="burger-btn" onclick="toggleMenu()" type="button" aria-label="Open menu">☰</button>
+    </header>
+<% end %>
+
+<% content_for :custom_styles do %>
+    /* Header with back button */
+    .top-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        border-bottom: 1px solid #F0F0F0;
+    }
+    
+    .top-header h1 {
+        flex: 1;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    /* Hero section - compact */
+    .hero-section {
+        position: relative;
+        margin: 12px 16px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .hero-image {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #E8F4F4 0%, #D4E8E8 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+    
+    .hero-info {
+        flex: 1;
+        padding-top: 4px;
+    }
+    
+    .hero-info h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 2px;
+    }
+    
+    .hero-info .subtitle {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 8px;
+    }
+    
+    .last-tried-badge {
+        display: inline-block;
+        background-color: var(--orange);
+        color: white;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
+    /* Apple badge with label */
+    .apple-badge-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    
+    .apple-badge {
+        width: 44px;
+        height: 44px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .apple-badge svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .apple-badge span {
+        position: absolute;
+        font-size: 16px;
+        font-weight: bold;
+        color: #555;
+        margin-top: 4px;
+    }
+    
+    .apple-label {
+        font-size: 8px;
+        color: #666;
+        margin-top: 2px;
+        text-align: center;
+    }
+    
+    /* Badges - 2 rows of 3 - compact */
+    .badges-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 0 16px;
+        margin-bottom: 16px;
+    }
+    
+    .badge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 10px 6px;
+        background: #FAFAFA;
+        border-radius: 10px;
+    }
+    
+    .badge-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+    
+    .badge-label {
+        font-size: 9px;
+        color: #666;
+        line-height: 1.2;
+    }
+    
+    /* Action buttons - compact */
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 0 16px;
+        margin-bottom: 16px;
+    }
+    
+    .action-btn {
+        background-color: var(--teal-light);
+        color: var(--teal-dark);
+        padding: 12px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        border: none;
+        text-align: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .action-btn:hover {
+        background-color: #D4E8E8;
+    }
+    
+    /* Progress section - compact */
+    .progress-section {
+        padding: 0 16px;
+        margin-bottom: 20px;
+    }
+    
+    .progress-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .progress-chart {
+        background: #FAFAFA;
+        border-radius: 10px;
+        padding: 12px;
+    }
+    
+    .progress-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .progress-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .progress-label {
+        width: 80px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #555;
+        flex-shrink: 0;
+    }
+    
+    .progress-bar-container {
+        flex: 1;
+        position: relative;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .progress-track {
+        width: 100%;
+        height: 3px;
+        background-color: #E0E0E0;
+        border-radius: 2px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+    
+    .progress-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #D0D0D0;
+        border-radius: 50%;
+        z-index: 1;
+        transition: all 0.2s;
+    }
+    
+    .progress-dot:hover {
+        background-color: #B0B0B0;
+        transform: scale(1.2);
+    }
+    
+    .progress-marker {
+        position: absolute;
+        width: 5px;
+        height: 20px;
+        background-color: #E07A5F;
+        border-radius: 3px;
+        cursor: grab;
+        transition: left 0.15s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        z-index: 2;
+    }
+    
+    .progress-marker:active {
+        cursor: grabbing;
+    }
+    
+    .chart-labels {
+        display: flex;
+        margin-top: 8px;
+        padding-left: 80px;
+    }
+    
+    .chart-labels span {
+        flex: 1;
+        text-align: center;
+        font-size: 8px;
+        color: #888;
+        font-weight: 500;
+    }
+    
+    .chart-labels span:first-child {
+        text-align: left;
+    }
+    
+    .chart-labels span:last-child {
+        text-align: right;
+    }
+    
+    /* Meal inspo */
+    .meal-inspo {
+        padding: 0 16px 20px;
+    }
+    
+    .meal-inspo-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 12px;
+    }
+    
+    .meal-cards {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .meal-card {
+        flex: 1;
+    }
+    
+    .meal-card-img {
+        width: 100%;
+        height: 110px;
+        background: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .meal-card-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #444;
+    }
+<% end %>
+
+<!-- Hero Section - Compact -->
+<div class="hero-section">
+    <div class="hero-image">[Image]</div>
+    <div class="hero-info">
+        <h2>Avocado</h2>
+        <p class="subtitle">Fruit</p>
+        <span class="last-tried-badge">Last tried 3/8/25</span>
+    </div>
+    <div class="apple-badge-container">
+        <div class="apple-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/>
+                <path d="M10 2c1 .5 2 2 2 5"/>
+            </svg>
+            <span>3</span>
+        </div>
+        <div class="apple-label">Times tried</div>
+    </div>
+</div>
+
+<!-- Badges - 2 rows of 3 -->
+<div class="badges-grid">
+    <div class="badge">
+        <div class="badge-icon bg-teal-light">
+            <span class="text-teal font-bold text-sm">6+</span>
+        </div>
+        <span class="badge-label">Suggested age (months)</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-red-100">
+            <span class="text-red-500 text-xl">✓</span>
+        </div>
+        <span class="badge-label">Common allergen</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-red-500">
+            <span class="text-white text-xs font-bold">Fe</span>
+        </div>
+        <span class="badge-label">Non-heme Iron-rich</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-yellow-400">
+            <span class="text-white font-bold">C</span>
+        </div>
+        <span class="badge-label">Vitamin C</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-teal-light">
+            <span class="text-teal text-lg">✕</span>
+        </div>
+        <span class="badge-label">Choking hazard</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-teal-light">
+            <span class="text-lg">✨</span>
+        </div>
+        <span class="badge-label">Milestone Magic</span>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="action-buttons">
+    <button class="action-btn">Nutrition Info</button>
+    <button class="action-btn">How to serve</button>
+    <button class="action-btn">Check Progress</button>
+    <button class="action-btn">FAQ's</button>
+</div>
+
+<!-- Progress Section -->
+<div class="progress-section">
+    <h3 class="progress-title">Sensory Progress</h3>
+    <div class="progress-chart">
+        <div class="progress-row">
+            <span class="progress-label">PUREE/MASH</span>
+            <div class="progress-bar-container" data-row="0">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="5"></div>
+            </div>
+        </div>
+        <div class="progress-row">
+            <span class="progress-label">STEAMED</span>
+            <div class="progress-bar-container" data-row="1">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="3"></div>
+            </div>
+        </div>
+        <div class="progress-row">
+            <span class="progress-label">ROASTED</span>
+            <div class="progress-bar-container" data-row="2">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="1"></div>
+            </div>
+        </div>
+        <div class="progress-row">
+            <span class="progress-label">RAW</span>
+            <div class="progress-bar-container" data-row="3">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="3"></div>
+            </div>
+        </div>
+    </div>
+    <div class="chart-labels">
+        <span>Sight</span>
+        <span>Smell</span>
+        <span>Touch</span>
+        <span>Taste</span>
+        <span>Chew</span>
+        <span>Swallow</span>
+    </div>
+</div>
+
+<!-- Meal Inspo Section -->
+<div class="meal-inspo">
+    <h3 class="meal-inspo-title">Meal Inspo with this food</h3>
+    <div class="meal-cards">
+        <div class="meal-card">
+            <div class="meal-card-img">[Meal Image]</div>
+            <p class="meal-card-label">Avocado toast 3 ways</p>
+        </div>
+        <div class="meal-card">
+            <div class="meal-card-img">[Meal Image]</div>
+            <p class="meal-card-label">Guacamole Dip</p>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_scripts do %>
+<script>
+    const POSITIONS = 6;
+    const MARKER_WIDTH = 5;
+    const DOT_WIDTH = 10;
+    
+    function setMarkerPosition(marker, position) {
+        const container = marker.parentElement;
+        const track = container.querySelector('.progress-track');
+        const dots = track.querySelectorAll('.progress-dot');
+        
+        if (dots[position]) {
+            const trackRect = track.getBoundingClientRect();
+            const dotRect = dots[position].getBoundingClientRect();
+            const dotCenter = dotRect.left + (dotRect.width / 2) - trackRect.left;
+            const markerLeft = dotCenter - (MARKER_WIDTH / 2);
+            marker.style.left = markerLeft + 'px';
+        }
+        
+        marker.dataset.position = position;
+        
+        // Haptic feedback if available
+        if (navigator.vibrate) {
+            navigator.vibrate(10);
+        }
+    }
+    
+    // Initialize all markers after layout
+    function initMarkers() {
+        document.querySelectorAll('.progress-marker').forEach(marker => {
+            const pos = parseInt(marker.dataset.position) || 0;
+            setMarkerPosition(marker, pos);
+        });
+    }
+    
+    // Run after DOM is ready and on resize
+    setTimeout(initMarkers, 10);
+    window.addEventListener('resize', initMarkers);
+    
+    // Click on dots to set position
+    document.querySelectorAll('.progress-dot').forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const pos = parseInt(dot.dataset.pos);
+            const container = dot.closest('.progress-bar-container');
+            const marker = container.querySelector('.progress-marker');
+            setMarkerPosition(marker, pos);
+        });
+    });
+    
+    // Click on track to set position
+    document.querySelectorAll('.progress-bar-container').forEach(container => {
+        container.addEventListener('click', (e) => {
+            if (e.target.classList.contains('progress-dot')) return;
+            
+            const track = container.querySelector('.progress-track');
+            const dots = track.querySelectorAll('.progress-dot');
+            const trackRect = track.getBoundingClientRect();
+            const clickX = e.clientX - trackRect.left;
+            
+            // Find closest dot
+            let closestPos = 0;
+            let closestDist = Infinity;
+            
+            dots.forEach((dot, i) => {
+                const dotRect = dot.getBoundingClientRect();
+                const dotCenter = dotRect.left + (dotRect.width / 2) - trackRect.left;
+                const dist = Math.abs(clickX - dotCenter);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestPos = i;
+                }
+            });
+            
+            const marker = container.querySelector('.progress-marker');
+            setMarkerPosition(marker, closestPos);
+        });
+    });
+    
+    // Drag functionality
+    document.querySelectorAll('.progress-marker').forEach(marker => {
+        let isDragging = false;
+        
+        const startDrag = (e) => {
+            isDragging = true;
+            e.preventDefault();
+            e.stopPropagation();
+        };
+        
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            
+            const container = marker.parentElement;
+            const track = container.querySelector('.progress-track');
+            const dots = track.querySelectorAll('.progress-dot');
+            const trackRect = track.getBoundingClientRect();
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const dragX = clientX - trackRect.left;
+            
+            // Find closest dot
+            let closestPos = 0;
+            let closestDist = Infinity;
+            
+            dots.forEach((dot, i) => {
+                const dotRect = dot.getBoundingClientRect();
+                const dotCenter = dotRect.left + (dotRect.width / 2) - trackRect.left;
+                const dist = Math.abs(dragX - dotCenter);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestPos = i;
+                }
+            });
+            
+            setMarkerPosition(marker, closestPos);
+        };
+        
+        const endDrag = () => {
+            isDragging = false;
+        };
+        
+        marker.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', endDrag);
+        
+        marker.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', doDrag);
+        document.addEventListener('touchend', endDrag);
+    });
+</script>
+<% end %>

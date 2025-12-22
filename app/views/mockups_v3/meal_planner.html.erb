@@ -1,0 +1,320 @@
+<% content_for :page_title do %>Bibado Meal Planner<% end %>
+
+<% content_for :header_subtitle do %>
+    <div class="flex items-center gap-3 mt-2">
+        <button class="text-2xl text-gray-400 p-2" aria-label="Previous week">‹</button>
+        <span class="bg-orange text-white px-5 py-2 rounded-full text-sm font-medium">August - Week 2</span>
+        <button class="text-2xl text-gray-400 p-2" aria-label="Next week">›</button>
+    </div>
+<% end %>
+
+<% content_for :header_right do %>
+    <div class="view-toggle">
+        <button class="view-btn">Day</button>
+        <button class="view-btn active">Week</button>
+        <button class="view-btn">Month</button>
+    </div>
+<% end %>
+
+<% content_for :custom_styles do %>
+    /* View toggle */
+    .view-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .view-btn {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+        cursor: pointer;
+    }
+    
+    .view-btn.active {
+        background-color: var(--teal);
+        color: white;
+    }
+    
+    .view-btn:not(.active) {
+        background-color: #F0F0F0;
+        color: #666;
+    }
+    
+    .view-btn:not(.active):hover {
+        border-color: var(--teal);
+    }
+    
+    /* Calendar grid */
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: 80px repeat(7, 1fr);
+        border-top: 1px solid var(--gray-border);
+    }
+    
+    .day-header {
+        text-align: center;
+        padding: 10px 4px;
+        border-bottom: 1px solid var(--gray-border);
+        border-right: 1px solid var(--gray-border);
+        font-size: 11px;
+    }
+    
+    .day-header .day-name {
+        color: #888;
+        font-weight: 500;
+    }
+    
+    .day-header .day-num {
+        font-weight: 700;
+        font-size: 14px;
+        color: #333;
+    }
+    
+    .day-header.has-content {
+        background-color: #FAFAFA;
+    }
+    
+    .row-label {
+        padding: 12px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #555;
+        background-color: #FAFAFA;
+        border-bottom: 1px solid var(--gray-border);
+        border-right: 1px solid var(--gray-border);
+        display: flex;
+        align-items: center;
+    }
+    
+    .meal-cell {
+        min-height: 52px;
+        padding: 4px;
+        border-bottom: 1px solid var(--gray-border);
+        border-right: 1px solid var(--gray-border);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .meal-cell:nth-child(odd) {
+        background-color: #FDFDFD;
+    }
+    
+    .meal-cell.selected {
+        box-shadow: inset 0 0 0 3px #7CB342;
+    }
+    
+    .meal-tag {
+        display: block;
+        padding: 6px;
+        font-size: 10px;
+        line-height: 1.2;
+        border-radius: 4px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .meal-tag-orange {
+        background-color: #F5D6C6;
+        color: #8B5A3C;
+    }
+    
+    .meal-tag-red {
+        background-color: #E57373;
+        color: white;
+    }
+    
+    .meal-tag-teal {
+        background-color: #D4E8E8;
+        color: #3D5A5A;
+    }
+    
+    .meal-tag-green {
+        background-color: #C8E6C9;
+        color: #2E7D32;
+    }
+    
+    .meal-tag-add {
+        background-color: transparent;
+        border: 2px dashed #CCC;
+        color: #999;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .meal-tag-add:hover {
+        border-color: var(--teal);
+        color: var(--teal);
+    }
+    
+    /* Food cards */
+    .food-card {
+        text-align: center;
+        min-width: 75px;
+        flex-shrink: 0;
+    }
+    
+    .food-card-img {
+        width: 65px;
+        height: 65px;
+        border-radius: 12px;
+        background-color: #F0F0F0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 6px;
+        font-size: 10px;
+        color: #999;
+    }
+    
+    .food-card-label {
+        font-size: 11px;
+        color: #555;
+    }
+    
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 12px;
+    }
+<% end %>
+
+<!-- Calendar Grid -->
+<div class="bg-white">
+    <div class="calendar-grid">
+        <!-- Header row -->
+        <div class="day-header"></div>
+        <div class="day-header has-content">
+            <div class="day-name">MON</div>
+            <div class="day-num">11</div>
+        </div>
+        <div class="day-header">
+            <div class="day-name">TUE</div>
+            <div class="day-num">12</div>
+        </div>
+        <div class="day-header">
+            <div class="day-name">WED</div>
+            <div class="day-num">13</div>
+        </div>
+        <div class="day-header">
+            <div class="day-name">THU</div>
+            <div class="day-num">14</div>
+        </div>
+        <div class="day-header">
+            <div class="day-name">FRI</div>
+            <div class="day-num">15</div>
+        </div>
+        <div class="day-header">
+            <div class="day-name">SAT</div>
+            <div class="day-num">16</div>
+        </div>
+        <div class="day-header">
+            <div class="day-name">SUN</div>
+            <div class="day-num">17</div>
+        </div>
+        
+        <!-- BREAKFAST Row -->
+        <div class="row-label">Breakfast</div>
+        <div class="meal-cell">
+            <div class="meal-tag meal-tag-red">Egg</div>
+            <div class="meal-tag meal-tag-orange">Squash puree</div>
+        </div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        
+        <!-- AM SNACK Row -->
+        <div class="row-label">AM Snack</div>
+        <div class="meal-cell">
+            <div class="meal-tag meal-tag-teal">Yoghurt</div>
+        </div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        
+        <!-- LUNCH Row -->
+        <div class="row-label">Lunch</div>
+        <div class="meal-cell selected">
+            <div class="meal-tag meal-tag-orange">Squash batons</div>
+        </div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        
+        <!-- PM SNACK Row -->
+        <div class="row-label">PM Snack</div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        
+        <!-- DINNER Row -->
+        <div class="row-label">Dinner</div>
+        <div class="meal-cell">
+            <div class="meal-tag meal-tag-orange">Squash finger foods</div>
+        </div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+        <div class="meal-cell"><div class="meal-tag meal-tag-add">+</div></div>
+    </div>
+</div>
+
+<!-- Foods tried this week -->
+<section class="p-4">
+    <h2 class="section-title">Foods tried this week</h2>
+    <div class="flex gap-3 overflow-x-auto pb-2">
+        <div class="food-card">
+            <div class="food-card-img">[img]</div>
+            <p class="food-card-label">Avocado</p>
+        </div>
+        <div class="food-card">
+            <div class="food-card-img">[img]</div>
+            <p class="food-card-label">Broccoli</p>
+        </div>
+        <div class="food-card">
+            <div class="food-card-img">[img]</div>
+            <p class="food-card-label">Onion</p>
+        </div>
+        <div class="food-card">
+            <div class="food-card-img">[img]</div>
+            <p class="food-card-label">Garlic</p>
+        </div>
+    </div>
+</section>
+
+<!-- Allergens tried this week -->
+<section class="px-4 pb-4">
+    <h2 class="section-title">Allergens tried this week</h2>
+    <div class="flex gap-3">
+        <div class="food-card">
+            <div class="food-card-img">[img]</div>
+            <p class="food-card-label">Peanuts</p>
+        </div>
+        <div class="food-card">
+            <div class="food-card-img">[img]</div>
+            <p class="food-card-label">Egg</p>
+        </div>
+    </div>
+</section>

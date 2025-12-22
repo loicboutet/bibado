@@ -1,0 +1,227 @@
+<% content_for :page_title do %>Bibado Meal Planner<% end %>
+
+<% content_for :header_subtitle do %>
+    <div class="flex items-center gap-2 mt-2">
+        <button class="text-xl text-gray-400">‹</button>
+        <span class="bg-orange text-white px-4 py-1 rounded-full text-sm font-medium">August - Week 2</span>
+        <button class="text-xl text-gray-400">›</button>
+    </div>
+<% end %>
+
+<% content_for :header_right do %>
+    <div class="flex flex-col gap-1">
+        <button class="text-white text-xs px-3 py-1 rounded-full" style="background-color: #7BA3A3;">Day</button>
+        <button class="text-white text-xs px-3 py-1 rounded-full" style="background-color: #7BA3A3;">Week</button>
+        <button class="text-white text-xs px-3 py-1 rounded-full" style="background-color: #7BA3A3;">Month</button>
+    </div>
+<% end %>
+
+<% content_for :custom_styles do %>
+    .meal-cell {
+        min-height: 44px;
+        font-size: 10px;
+        border-right: 1px solid var(--gray-border);
+        border-bottom: 1px solid var(--gray-border);
+        position: relative;
+    }
+    
+    .meal-tag {
+        display: block;
+        padding: 4px 6px;
+        font-size: 10px;
+        line-height: 1.2;
+    }
+    
+    .meal-tag-orange {
+        background-color: #F5D6C6;
+        color: #8B5A3C;
+    }
+    
+    .meal-tag-red {
+        background-color: #E57373;
+        color: white;
+    }
+    
+    .meal-tag-teal {
+        background-color: #B8D4D4;
+        color: #3D5A5A;
+    }
+    
+    .meal-tag-green {
+        background-color: #C8E6C9;
+        color: #2E7D32;
+    }
+    
+    .row-label {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        transform: rotate(180deg);
+        font-size: 10px;
+        color: #666;
+        padding: 4px;
+        text-align: center;
+    }
+    
+    .food-card {
+        width: 80px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    .food-card img {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid var(--gray-border);
+    }
+    
+    .border-green-sel { 
+        border: 3px solid #7CB342 !important; 
+    }
+<% end %>
+
+<!-- Calendar Grid -->
+<div class="bg-white">
+    <!-- Day Headers -->
+    <div class="grid" style="grid-template-columns: 28px repeat(7, 1fr);">
+        <div class="p-1"></div>
+        <div class="text-center py-2 border-b border-r text-xs">
+            <div class="font-medium text-gray-600">MON</div>
+            <div class="font-bold">11</div>
+        </div>
+        <div class="text-center py-2 border-b border-r text-xs">
+            <div class="font-medium text-gray-600">TUE</div>
+            <div class="font-bold">12</div>
+        </div>
+        <div class="text-center py-2 border-b border-r text-xs">
+            <div class="font-medium text-gray-600">WED</div>
+            <div class="font-bold">13</div>
+        </div>
+        <div class="text-center py-2 border-b border-r text-xs">
+            <div class="font-medium text-gray-600">THU</div>
+            <div class="font-bold">14</div>
+        </div>
+        <div class="text-center py-2 border-b border-r text-xs">
+            <div class="font-medium text-gray-600">FRI</div>
+            <div class="font-bold">15</div>
+        </div>
+        <div class="text-center py-2 border-b border-r text-xs">
+            <div class="font-medium text-gray-600">SAT</div>
+            <div class="font-bold">16</div>
+        </div>
+        <div class="text-center py-2 border-b text-xs">
+            <div class="font-medium text-gray-600">SUN</div>
+            <div class="font-bold">17</div>
+        </div>
+    </div>
+    
+    <!-- BREAKFAST Row -->
+    <div class="grid" style="grid-template-columns: 28px repeat(7, 1fr);">
+        <div class="row-label border-b">BREAKFAST</div>
+        <div class="meal-cell">
+            <div class="meal-tag meal-tag-red">Egg</div>
+            <div class="meal-tag meal-tag-orange">Squash - puree</div>
+        </div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell" style="border-right: none;"></div>
+    </div>
+    
+    <!-- AM SNACK Row -->
+    <div class="grid" style="grid-template-columns: 28px repeat(7, 1fr);">
+        <div class="row-label border-b">AM SNACK</div>
+        <div class="meal-cell">
+            <div class="meal-tag meal-tag-teal">Yoghurt</div>
+        </div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell">
+            <div class="meal-tag meal-tag-green">+ add meal</div>
+        </div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell" style="border-right: none;"></div>
+    </div>
+    
+    <!-- LUNCH Row -->
+    <div class="grid" style="grid-template-columns: 28px repeat(7, 1fr);">
+        <div class="row-label border-b">LUNCH</div>
+        <div class="meal-cell border-green-sel">
+            <div class="meal-tag meal-tag-orange">Squash - batons</div>
+        </div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell" style="border-right: none;"></div>
+    </div>
+    
+    <!-- PM SNACK Row -->
+    <div class="grid" style="grid-template-columns: 28px repeat(7, 1fr);">
+        <div class="row-label border-b">PM SNACK</div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell" style="border-right: none;"></div>
+    </div>
+    
+    <!-- DINNER Row -->
+    <div class="grid" style="grid-template-columns: 28px repeat(7, 1fr);">
+        <div class="row-label border-b">DINNER</div>
+        <div class="meal-cell">
+            <div class="meal-tag meal-tag-orange">Squash - finger foods</div>
+        </div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell"></div>
+        <div class="meal-cell" style="border-right: none;"></div>
+    </div>
+</div>
+
+<!-- Foods tried this week -->
+<section class="p-4">
+    <h2 class="font-bold text-gray-800 mb-3">Foods tried this week</h2>
+    <div class="flex gap-3 overflow-x-auto pb-2">
+        <div class="food-card">
+            <div class="w-16 h-16 bg-gray-200 rounded-xl border-2 border-gray-300 flex items-center justify-center text-xs text-gray-400">[img]</div>
+            <p class="text-xs mt-1">Avocado</p>
+        </div>
+        <div class="food-card">
+            <div class="w-16 h-16 bg-gray-200 rounded-xl border-2 border-gray-300 flex items-center justify-center text-xs text-gray-400">[img]</div>
+            <p class="text-xs mt-1">Broccoli</p>
+        </div>
+        <div class="food-card">
+            <div class="w-16 h-16 bg-gray-200 rounded-xl border-2 border-gray-300 flex items-center justify-center text-xs text-gray-400">[img]</div>
+            <p class="text-xs mt-1">Onion</p>
+        </div>
+        <div class="food-card">
+            <div class="w-16 h-16 bg-gray-200 rounded-xl border-2 border-gray-300 flex items-center justify-center text-xs text-gray-400">[img]</div>
+            <p class="text-xs mt-1">Garlic</p>
+        </div>
+    </div>
+</section>
+
+<!-- Allergens tried this week -->
+<section class="px-4 pb-8">
+    <h2 class="font-bold text-gray-800 mb-3">Allergens tried this week</h2>
+    <div class="flex gap-3">
+        <div class="food-card">
+            <div class="w-16 h-16 bg-gray-200 rounded-xl border-2 border-gray-300 flex items-center justify-center text-xs text-gray-400">[img]</div>
+            <p class="text-xs mt-1">Peanuts</p>
+        </div>
+        <div class="food-card">
+            <div class="w-16 h-16 bg-gray-200 rounded-xl border-2 border-gray-300 flex items-center justify-center text-xs text-gray-400">[img]</div>
+            <p class="text-xs mt-1">Egg</p>
+        </div>
+    </div>
+</section>

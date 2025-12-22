@@ -1,0 +1,408 @@
+<% content_for :page_title do %>Avocado<% end %>
+
+<% content_for :custom_styles do %>
+    .badge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 10px;
+        text-align: center;
+        width: 55px;
+    }
+    
+    .badge-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+        font-size: 16px;
+    }
+    
+    .action-btn {
+        background-color: var(--teal-light);
+        color: #4A7A7A;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        width: 100%;
+    }
+    
+    .action-btn:hover {
+        background-color: #D5E8E8;
+    }
+    
+    .progress-chart {
+        font-size: 11px;
+        color: #666;
+    }
+    
+    .progress-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .progress-label {
+        width: 80px;
+        text-align: left;
+        font-weight: 500;
+        font-size: 10px;
+        flex-shrink: 0;
+    }
+    
+    .progress-bar-container {
+        flex: 1;
+        position: relative;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .progress-track {
+        width: 100%;
+        height: 2px;
+        background-color: #E0E0E0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .progress-dot {
+        width: 6px;
+        height: 6px;
+        background-color: #E0E0E0;
+        border-radius: 50%;
+    }
+    
+    .progress-marker {
+        position: absolute;
+        width: 4px;
+        height: 18px;
+        background-color: #E07A5F;
+        border-radius: 2px;
+        cursor: grab;
+        transition: left 0.15s ease;
+    }
+    
+    .progress-marker:active {
+        cursor: grabbing;
+    }
+    
+    .chart-labels {
+        display: flex;
+        font-size: 8px;
+        color: #999;
+        margin-left: 80px;
+        margin-top: 4px;
+    }
+    
+    .chart-labels span {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .chart-labels span:first-child {
+        text-align: left;
+    }
+    
+    .chart-labels span:last-child {
+        text-align: right;
+    }
+    
+    .apple-badge {
+        width: 50px;
+        height: 50px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .apple-badge svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .apple-badge span {
+        position: absolute;
+        font-size: 20px;
+        font-weight: bold;
+        color: #555;
+    }
+    
+    .meal-card {
+        width: 48%;
+    }
+    
+    .meal-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+    
+    .last-tried-badge {
+        background-color: var(--orange);
+        color: white;
+        padding: 8px 14px;
+        padding-right: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .last-tried-badge::after {
+        content: '';
+        position: absolute;
+        right: -12px;
+        top: 0;
+        width: 0;
+        height: 0;
+        border-top: 18px solid transparent;
+        border-bottom: 18px solid transparent;
+        border-left: 12px solid var(--orange);
+    }
+<% end %>
+
+<!-- Hero Image Section -->
+<div class="relative px-4 mb-6 pt-2">
+    <div class="absolute top-6 left-0 z-10">
+        <span class="last-tried-badge">Last tried 3/8/25</span>
+    </div>
+    <div class="absolute top-4 right-6 z-10">
+        <div class="apple-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/>
+                <path d="M10 2c1 .5 2 2 2 5"/>
+            </svg>
+            <span>3</span>
+        </div>
+    </div>
+    <!-- Placeholder for avocado hero image -->
+    <div class="w-full h-56 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+        [Avocado Hero Image]
+    </div>
+</div>
+
+<!-- Title Section -->
+<div class="px-6 mb-4">
+    <h2 class="text-2xl font-bold text-gray-800">Avocado</h2>
+    <p class="text-gray-500">Fruit</p>
+</div>
+
+<!-- Badges Row -->
+<div class="flex justify-between px-4 mb-6">
+    <div class="badge">
+        <div class="badge-icon bg-teal-light">
+            <span class="text-teal font-bold">6<sup class="text-xs">+</sup><sub class="text-xs">mths</sub></span>
+        </div>
+        <span>Suggested age</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-red-100">
+            <span class="text-red-500 text-xl">✓</span>
+        </div>
+        <span>Common allergen</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-red-500">
+            <span class="text-white text-xs font-bold">Fe</span>
+        </div>
+        <span>Non-heme Iron-rich</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-yellow-400">
+            <span class="text-white font-bold">C</span>
+        </div>
+        <span>Vit C</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-teal-light">
+            <span class="text-teal text-xl">✕</span>
+        </div>
+        <span>Choking hazard</span>
+    </div>
+    <div class="badge">
+        <div class="badge-icon bg-teal-light">
+            <span class="text-xs">✨</span>
+        </div>
+        <span>Milestone Magic</span>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="px-6 mb-6">
+    <div class="grid grid-cols-2 gap-3">
+        <button class="action-btn">Nutrition Info</button>
+        <button class="action-btn">How to serve</button>
+        <button class="action-btn">Check Progress</button>
+        <button class="action-btn">FAQ's</button>
+    </div>
+</div>
+
+<!-- Progress Chart -->
+<div class="px-6 mb-6">
+    <div class="progress-chart" id="progressChart">
+        <div class="progress-row">
+            <span class="progress-label">PUREE/MASH</span>
+            <div class="progress-bar-container" data-row="0">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="5"></div>
+            </div>
+        </div>
+        <div class="progress-row">
+            <span class="progress-label">STEAMED</span>
+            <div class="progress-bar-container" data-row="1">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="3"></div>
+            </div>
+        </div>
+        <div class="progress-row">
+            <span class="progress-label">ROASTED</span>
+            <div class="progress-bar-container" data-row="2">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="1"></div>
+            </div>
+        </div>
+        <div class="progress-row">
+            <span class="progress-label">RAW</span>
+            <div class="progress-bar-container" data-row="3">
+                <div class="progress-track">
+                    <div class="progress-dot" data-pos="0"></div>
+                    <div class="progress-dot" data-pos="1"></div>
+                    <div class="progress-dot" data-pos="2"></div>
+                    <div class="progress-dot" data-pos="3"></div>
+                    <div class="progress-dot" data-pos="4"></div>
+                    <div class="progress-dot" data-pos="5"></div>
+                </div>
+                <div class="progress-marker" data-position="3"></div>
+            </div>
+        </div>
+    </div>
+    <div class="chart-labels">
+        <span>SIGHT</span>
+        <span>SMELL</span>
+        <span>TOUCH</span>
+        <span>TASTE</span>
+        <span>CHEW</span>
+        <span>SAFELY SWALLOW</span>
+    </div>
+</div>
+
+<!-- Meal Inspo Section -->
+<div class="px-6 pb-8">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Meal Inspo with this food</h3>
+    <div class="flex gap-4">
+        <div class="meal-card">
+            <!-- Placeholder for meal image -->
+            <div class="w-full h-28 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-xs mb-2">
+                [Meal Image]
+            </div>
+            <p class="text-sm font-medium text-gray-700">Avocado toast 3 ways</p>
+        </div>
+        <div class="meal-card">
+            <!-- Placeholder for meal image -->
+            <div class="w-full h-28 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-xs mb-2">
+                [Meal Image]
+            </div>
+            <p class="text-sm font-medium text-gray-700">Guacamole Dip</p>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_scripts do %>
+<script>
+    const POSITIONS = 6;
+    
+    function setMarkerPosition(marker, position) {
+        const percentage = (position / (POSITIONS - 1)) * 100;
+        marker.style.left = `calc(${percentage}% - 2px)`;
+        marker.dataset.position = position;
+    }
+    
+    // Initialize all markers
+    document.querySelectorAll('.progress-marker').forEach(marker => {
+        const pos = parseInt(marker.dataset.position) || 0;
+        setMarkerPosition(marker, pos);
+    });
+    
+    // Click on track to set position
+    document.querySelectorAll('.progress-bar-container').forEach(container => {
+        container.addEventListener('click', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = x / rect.width;
+            const position = Math.round(percentage * (POSITIONS - 1));
+            const clampedPos = Math.max(0, Math.min(POSITIONS - 1, position));
+            
+            const marker = container.querySelector('.progress-marker');
+            setMarkerPosition(marker, clampedPos);
+        });
+    });
+    
+    // Drag functionality
+    document.querySelectorAll('.progress-marker').forEach(marker => {
+        let isDragging = false;
+        
+        const startDrag = (e) => {
+            isDragging = true;
+            e.preventDefault();
+            e.stopPropagation();
+        };
+        
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            
+            const container = marker.parentElement;
+            const rect = container.getBoundingClientRect();
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const x = clientX - rect.left;
+            const percentage = x / rect.width;
+            const position = Math.round(percentage * (POSITIONS - 1));
+            const clampedPos = Math.max(0, Math.min(POSITIONS - 1, position));
+            
+            setMarkerPosition(marker, clampedPos);
+        };
+        
+        const endDrag = () => {
+            isDragging = false;
+        };
+        
+        marker.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', endDrag);
+        
+        marker.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', doDrag);
+        document.addEventListener('touchend', endDrag);
+    });
+</script>
+<% end %>

@@ -1,145 +1,194 @@
-<% content_for :title, "Log Meal - Bibado" %>
+<% content_for :title, "Meal Feedback - Bibado" %>
 
-<!-- Header -->
-<div class="bg-white border-b border-gray-200 px-4 py-3">
-  <div class="flex items-center justify-between">
-    <%= link_to mockups_meal_plan_path, class: "p-1 hover:bg-gray-100 rounded" do %>
-      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    <% end %>
-    <h1 class="font-semibold text-[#2C3E50]">Log Meal</h1>
-    <div class="w-6"></div>
-  </div>
-</div>
-
-<!-- Question 1: Did you serve the planned meal? -->
-<div class="px-4 py-6">
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-    <h2 class="font-semibold text-[#2C3E50] mb-4">Did you serve today's <%= @current_meal[:time].downcase %>?</h2>
-    
-    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl mb-4">
-      <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm">
-        <span class="text-3xl"><%= @current_meal[:emoji] %></span>
-      </div>
-      <div>
-        <p class="font-medium text-[#2C3E50]"><%= @current_meal[:name] %></p>
-        <p class="text-sm text-gray-500"><%= @current_meal[:time] %></p>
-      </div>
-    </div>
-    
-    <div class="flex gap-3">
-      <button onclick="showServedContent()" class="flex-1 py-3 bg-[#4ECDC4] text-white rounded-xl font-medium hover:bg-[#3DB9B0] transition-colors">
-        Yes, served it
-      </button>
-      <button onclick="showAlternativeContent()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-colors">
-        No, different meal
-      </button>
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-[#4ECDC4] text-white px-4 py-3">
+    <div class="flex items-center justify-between">
+      <%= link_to mockups_meal_plan_path, class: "p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors" do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      <% end %>
+      <h1 class="text-lg font-bold">Log Meal Feedback</h1>
+      <div class="w-6"></div>
     </div>
   </div>
-</div>
 
-<!-- Interaction tracking (shown after "Yes") -->
-<div id="served-content" class="hidden px-4 pb-6">
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-    <h2 class="font-semibold text-[#2C3E50] mb-4">How did <%= baby_name %> get on with each food?</h2>
-    
-    <% @current_meal[:foods].each do |food| %>
-      <div class="mb-6 last:mb-0">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="text-xl"><%= food[:emoji] %></span>
-          <span class="font-medium text-[#2C3E50]"><%= food[:name] %></span>
+  <!-- Current Meal Card -->
+  <div class="px-4 py-4">
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <p class="text-sm text-gray-500 mb-3">Today's <%= @current_meal[:time].downcase %></p>
+      
+      <div class="flex items-center gap-4">
+        <div class="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=100&h=100&fit=crop" alt="<%= @current_meal[:name] %>" class="w-full h-full object-cover" onerror="this.innerHTML='<span class=\'text-4xl\'><%= @current_meal[:emoji] %></span>'">
         </div>
-        
-        <!-- Interaction slider -->
-        <div class="relative">
-          <input type="range" min="0" max="5" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FF6B6B]">
-          <div class="flex justify-between text-xs text-gray-500 mt-2">
-            <span>Saw</span>
-            <span>Smelt</span>
-            <span>Touched</span>
-            <span>Tasted</span>
-            <span>Chewed</span>
-            <span>Swallowed</span>
+        <div class="flex-1">
+          <h2 class="font-bold text-lg text-gray-800"><%= @current_meal[:name] %></h2>
+          <p class="text-gray-500 text-sm">with <%= @current_meal[:foods].map { |f| f[:name] }.join(', ') %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Did you serve it? -->
+  <div class="px-4 pb-4">
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <h3 class="font-semibold text-gray-800 mb-4">Did you serve this meal?</h3>
+      
+      <div class="flex gap-3">
+        <button id="btn-yes" onclick="showFeedbackForm()" class="flex-1 py-3 bg-[#4ECDC4] text-white rounded-xl font-medium hover:bg-[#3DB9B0] transition-colors flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Yes, served it
+        </button>
+        <button id="btn-no" onclick="showAlternative()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          No, different
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Form (hidden initially) -->
+  <div id="feedback-form" class="hidden px-4 pb-4 space-y-4">
+    <!-- How did baby interact with each food? -->
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <h3 class="font-semibold text-gray-800 mb-4">How did <%= baby_name %> interact with each food?</h3>
+      
+      <% @current_meal[:foods].each_with_index do |food, idx| %>
+        <div class="<%= idx > 0 ? 'mt-6 pt-6 border-t border-gray-100' : '' %>">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span class="text-xl"><%= food[:emoji] %></span>
+            </div>
+            <span class="font-medium text-gray-800"><%= food[:name] %></span>
+          </div>
+          
+          <!-- Interaction Progress Chart -->
+          <div class="space-y-3">
+            <% ['PUREE/MASH', 'STEAMED', 'ROASTED', 'RAW'].each_with_index do |prep_method, prep_idx| %>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500 w-20"><%= prep_method %></span>
+                <div class="flex-1 relative">
+                  <div class="h-1 bg-gray-200 rounded-full"></div>
+                  <% if prep_idx < 2 %>
+                    <div class="absolute top-1/2 -translate-y-1/2 w-1 h-3 bg-[#D4A574] rounded" style="left: <%= [80, 50, 30, 10][prep_idx] %>%;"></div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            
+            <!-- Interaction Scale Labels -->
+            <div class="flex justify-between text-[10px] text-gray-400 mt-2 pl-24">
+              <span>SIGHT</span>
+              <span>SMELL</span>
+              <span>TOUCH</span>
+              <span>TASTE</span>
+              <span>CHEW</span>
+              <span>SAFELY SWALLOW</span>
+            </div>
           </div>
         </div>
-      </div>
-    <% end %>
-  </div>
-  
-  <!-- Optional extra -->
-  <div class="mt-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-    <h3 class="font-medium text-[#2C3E50] mb-3">Did you add the optional extra?</h3>
-    <p class="text-sm text-gray-500 mb-3">(<%= @current_meal[:optional_extra] %>)</p>
-    <div class="flex gap-3">
-      <button class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">Yes</button>
-      <button class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">No</button>
-    </div>
-  </div>
-  
-  <!-- Submit button -->
-  <div class="mt-6">
-    <%= link_to mockups_meal_plan_path, class: "block w-full py-4 bg-[#FF6B6B] text-white rounded-xl font-semibold text-center hover:bg-[#E85555] transition-colors" do %>
-      Save & Continue
-    <% end %>
-  </div>
-</div>
-
-<!-- Alternative meal selection (shown after "No") -->
-<div id="alternative-content" class="hidden px-4 pb-6">
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-    <h2 class="font-semibold text-[#2C3E50] mb-4">Did <%= baby_name %> have a different meal?</h2>
-    
-    <div class="flex gap-3 mb-4">
-      <button class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-colors">
-        No meal
-      </button>
-      <button class="flex-1 py-3 bg-[#4ECDC4] text-white rounded-xl font-medium" disabled>
-        Select meal
-      </button>
-    </div>
-    
-    <!-- Search meals -->
-    <div class="relative mb-4">
-      <input type="text" placeholder="Search foods or meals..." 
-             class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/20 outline-none">
-      <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-      </svg>
-    </div>
-    
-    <!-- Quick picks -->
-    <p class="text-sm text-gray-500 mb-2">Quick picks</p>
-    <div class="flex flex-wrap gap-2">
-      <% [
-        { name: 'Banana', emoji: '🍌' },
-        { name: 'Avocado', emoji: '🥑' },
-        { name: 'Sweet Potato', emoji: '🍠' }
-      ].each do |food| %>
-        <button class="flex items-center gap-1 px-3 py-2 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors">
-          <span><%= food[:emoji] %></span>
-          <span class="text-sm text-gray-600"><%= food[:name] %></span>
-        </button>
       <% end %>
     </div>
-  </div>
-  
-  <!-- Skip button -->
-  <div class="mt-4">
-    <%= link_to mockups_meal_plan_path, class: "block w-full py-3 text-gray-500 text-center font-medium" do %>
-      Skip for now
+
+    <!-- Optional Extra -->
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <h3 class="font-semibold text-gray-800 mb-2">Did you add the optional extra?</h3>
+      <p class="text-sm text-gray-500 mb-3">(<%= @current_meal[:optional_extra] %>)</p>
+      
+      <div class="flex gap-3">
+        <button class="flex-1 py-2 bg-[#4ECDC4] text-white rounded-lg text-sm font-medium">Yes</button>
+        <button class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium">No</button>
+      </div>
+    </div>
+
+    <!-- Any reactions? -->
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <h3 class="font-semibold text-gray-800 mb-3">Any reactions or notes?</h3>
+      <textarea placeholder="e.g., loved the banana, wasn't interested in oats..." class="w-full p-3 border border-gray-200 rounded-xl text-sm resize-none h-20 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none"></textarea>
+    </div>
+
+    <!-- Save Button -->
+    <%= link_to mockups_meal_plan_path, class: "block w-full py-4 bg-[#FF6B6B] text-white rounded-xl font-bold text-center hover:bg-[#E85555] transition-colors shadow-lg" do %>
+      Save Feedback
     <% end %>
+  </div>
+
+  <!-- Alternative Meal Selection (hidden initially) -->
+  <div id="alternative-form" class="hidden px-4 pb-4 space-y-4">
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <h3 class="font-semibold text-gray-800 mb-4">What did <%= baby_name %> have instead?</h3>
+      
+      <div class="flex gap-3 mb-4">
+        <button class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-colors">
+          Skipped meal
+        </button>
+        <button class="flex-1 py-3 bg-[#4ECDC4] text-white rounded-xl font-medium">
+          Different meal
+        </button>
+      </div>
+      
+      <!-- Search -->
+      <div class="relative mb-4">
+        <input type="text" placeholder="Search foods or meals..." 
+               class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none">
+        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      
+      <!-- Quick picks -->
+      <p class="text-sm text-gray-500 mb-3">Quick picks</p>
+      <div class="flex flex-wrap gap-2">
+        <% [
+          { name: 'Banana', emoji: '🍌' },
+          { name: 'Avocado', emoji: '🥑' },
+          { name: 'Sweet Potato', emoji: '🍠' },
+          { name: 'Apple', emoji: '🍎' },
+          { name: 'Broccoli', emoji: '🥦' }
+        ].each do |food| %>
+          <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full hover:bg-[#4ECDC4]/20 transition-colors">
+            <span><%= food[:emoji] %></span>
+            <span class="text-sm text-gray-700"><%= food[:name] %></span>
+          </button>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Back / Skip buttons -->
+    <div class="flex gap-3">
+      <button onclick="hideAlternative()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium">
+        Back
+      </button>
+      <%= link_to mockups_meal_plan_path, class: "flex-1 py-3 text-gray-500 text-center font-medium" do %>
+        Skip for now
+      <% end %>
+    </div>
   </div>
 </div>
 
 <script>
-function showServedContent() {
-  document.getElementById('served-content').classList.remove('hidden');
-  document.getElementById('alternative-content').classList.add('hidden');
+function showFeedbackForm() {
+  document.getElementById('feedback-form').classList.remove('hidden');
+  document.getElementById('alternative-form').classList.add('hidden');
+  document.getElementById('btn-yes').classList.add('ring-2', 'ring-[#4ECDC4]');
+  document.getElementById('btn-no').classList.remove('ring-2', 'ring-[#4ECDC4]');
 }
 
-function showAlternativeContent() {
-  document.getElementById('alternative-content').classList.remove('hidden');
-  document.getElementById('served-content').classList.add('hidden');
+function showAlternative() {
+  document.getElementById('alternative-form').classList.remove('hidden');
+  document.getElementById('feedback-form').classList.add('hidden');
+  document.getElementById('btn-no').classList.add('ring-2', 'ring-gray-300');
+  document.getElementById('btn-yes').classList.remove('ring-2', 'ring-[#4ECDC4]');
+}
+
+function hideAlternative() {
+  document.getElementById('alternative-form').classList.add('hidden');
+  document.getElementById('btn-no').classList.remove('ring-2', 'ring-gray-300');
 }
 </script>

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="meal-calendar"
 export default class extends Controller {
-  static targets = ["mealSlot", "swapModal", "previewModal", "previewContent"]
+  static targets = ["mealSlot", "swapModal", "previewModal", "previewContent", "addMealModal"]
   
   draggedItem = null
   currentSlot = null
@@ -397,6 +397,38 @@ export default class extends Controller {
     if (this.hasSwapModalTarget) {
       this.swapModalTarget.classList.add('hidden')
       this.swapModalTarget.classList.remove('flex')
+    }
+  }
+
+  // Add meal modal
+  showAddMeal(e) {
+    if (this.hasAddMealModalTarget) {
+      this.addMealModalTarget.classList.remove('hidden')
+      this.addMealModalTarget.classList.add('flex')
+    }
+  }
+
+  closeAddMealModal(e) {
+    if (e && e.target !== this.addMealModalTarget && !e.target.closest('[data-close-modal]')) return
+    
+    if (this.hasAddMealModalTarget) {
+      this.addMealModalTarget.classList.add('hidden')
+      this.addMealModalTarget.classList.remove('flex')
+    }
+  }
+
+  stopPropagation(e) {
+    e.stopPropagation()
+  }
+
+  showSwapModal() {
+    if (this.hasPreviewModalTarget) {
+      this.previewModalTarget.classList.add('hidden')
+      this.previewModalTarget.classList.remove('flex')
+    }
+    if (this.hasSwapModalTarget) {
+      this.swapModalTarget.classList.remove('hidden')
+      this.swapModalTarget.classList.add('flex')
     }
   }
 

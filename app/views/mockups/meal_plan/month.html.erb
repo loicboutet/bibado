@@ -1,84 +1,162 @@
 <% content_for :title, "Month View - Bibado" %>
 
-<!-- Header with view toggle -->
-<div class="bg-white border-b border-gray-200 px-4 py-3">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <button class="p-1 hover:bg-gray-100 rounded">
-        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-      </button>
-      <h1 class="font-semibold text-[#2C3E50]"><%= Date.today.strftime('%B %Y') %></h1>
-      <button class="p-1 hover:bg-gray-100 rounded">
-        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-        </svg>
-      </button>
+<% content_for :custom_header do %>
+  <!-- Meal Planner Header - Mobile optimized -->
+  <div class="bg-[#4ECDC4] text-white">
+    <!-- Row 1: Title + View Buttons -->
+    <div class="px-4 pt-3 pb-2 flex items-center justify-between">
+      <h1 class="text-xl font-bold italic">Bibado Meal Planner</h1>
+      <div class="flex flex-col gap-0.5">
+        <%= link_to day_mockups_meal_plan_path, class: "px-4 py-0.5 text-[11px] font-medium rounded-full bg-[#6B9F9C] text-white text-center" do %>Day<% end %>
+        <%= link_to mockups_meal_plan_path, class: "px-4 py-0.5 text-[11px] font-medium rounded-full bg-[#6B9F9C] text-white text-center" do %>Week<% end %>
+        <%= link_to month_mockups_meal_plan_path, class: "px-4 py-0.5 text-[11px] font-medium rounded-full bg-[#D4A574] text-white text-center" do %>Month<% end %>
+      </div>
     </div>
     
-    <div class="flex bg-gray-100 rounded-lg p-0.5">
-      <%= link_to day_mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded text-gray-500" do %>D<% end %>
-      <%= link_to mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded text-gray-500" do %>W<% end %>
-      <%= link_to month_mockups_meal_plan_path, class: "px-2 py-1 text-xs font-medium rounded bg-white shadow-sm text-[#2C3E50]" do %>M<% end %>
+    <!-- Row 2: Burger + Month Navigation -->
+    <div class="px-4 pb-3 flex items-center">
+      <button class="mr-3" data-action="click->mobile-menu#toggle">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      
+      <div class="flex-1 flex items-center justify-center gap-2">
+        <%= link_to month_mockups_meal_plan_path(month: ((@month || 2) - 1)), class: "text-white/80 hover:text-white" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        <% end %>
+        <span class="bg-[#D4A574] px-5 py-1.5 rounded-full font-bold text-sm uppercase">
+          FEBRUARY
+        </span>
+        <%= link_to month_mockups_meal_plan_path(month: ((@month || 2) + 1)), class: "text-white/80 hover:text-white" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
+<% end %>
 
-<!-- Month Calendar Grid -->
-<div class="px-4 py-4">
-  <!-- Day headers -->
-  <div class="grid grid-cols-7 gap-1 mb-2">
-    <% %w[S M T W T F S].each do |day| %>
-      <div class="text-center text-xs font-medium text-gray-500 py-2"><%= day %></div>
-    <% end %>
-  </div>
-  
-  <!-- Calendar grid -->
-  <div class="grid grid-cols-7 gap-1">
-    <% # Padding for start of month %>
-    <% Date.today.beginning_of_month.wday.times do %>
-      <div class="aspect-square"></div>
-    <% end %>
+<div data-controller="meal-calendar" class="min-h-screen bg-gray-100">
+
+  <!-- Month Calendar Grid -->
+  <div class="px-2 py-2">
+    <!-- Day headers -->
+    <div class="grid grid-cols-7 gap-1 mb-1">
+      <% %w[MON TUE WED THU FRI SAT SUN].each do |day| %>
+        <div class="text-center text-[10px] font-semibold text-gray-500 py-1"><%= day %></div>
+      <% end %>
+    </div>
     
-    <% @month_data.each do |day_data| %>
-      <%= link_to day_mockups_meal_plan_path(date: day_data[:date]), class: "aspect-square" do %>
-        <div class="h-full bg-white rounded-lg border <%= day_data[:date] == Date.today ? 'border-[#FF6B6B] border-2' : 'border-gray-100' %> p-1 hover:shadow-md transition-shadow">
-          <span class="text-xs font-medium <%= day_data[:date] == Date.today ? 'text-[#FF6B6B]' : 'text-gray-600' %>">
-            <%= day_data[:date].day %>
-          </span>
-          
-          <% if day_data[:has_meals] %>
-            <!-- Meal indicators -->
-            <div class="flex flex-col gap-0.5 mt-1">
-              <% day_data[:meal_indicators].each_with_index do |has_meal, idx| %>
-                <div class="h-1 rounded-full <%= has_meal ? (idx == 2 ? 'bg-[#4ECDC4]' : 'bg-[#FF6B6B]') : 'bg-transparent' %>"></div>
-              <% end %>
-            </div>
-          <% end %>
+    <%
+      # February 2025 sample data with colored meal bars
+      # Each day has up to 5 meal slots represented by colored bars
+      month_meals = {
+        # Week 1 (partial - starts on Saturday)
+        1 => nil, # SAT
+        2 => nil, # SUN
+        
+        # Week 2
+        3 => { meals: [['#4ECDC4', '#4ECDC4'], ['#9DC87E', '#9DC87E'], ['#D4A574', '#D4A574'], ['#8B6914', '#8B6914'], ['#4ECDC4', '#4ECDC4']] },
+        4 => { meals: [['#4ECDC4', '#4ECDC4'], ['#9DC87E', '#9DC87E'], ['#D4A574', '#D4A574'], ['#8B6914', '#8B6914'], ['#4ECDC4', '#4ECDC4']] },
+        5 => { meals: [['#4ECDC4', '#4ECDC4'], ['#9DC87E', '#9DC87E'], ['#D4A574', '#D4A574'], ['#8B6914', '#8B6914'], ['#4ECDC4', '#4ECDC4']] },
+        6 => { meals: [['#4ECDC4', '#4ECDC4'], ['#9DC87E', '#9DC87E'], ['#D4A574', '#D4A574'], ['#8B6914', '#8B6914'], ['#4ECDC4', '#4ECDC4']] },
+        7 => { selected: true }, # Current day indicator
+        8 => nil,
+        9 => nil,
+        
+        # Week 3
+        10 => nil, 11 => nil, 12 => nil, 13 => nil, 14 => nil, 15 => nil, 16 => nil,
+        
+        # Week 4
+        17 => nil, 18 => nil, 19 => nil, 20 => nil, 21 => nil, 22 => nil, 23 => nil,
+        24 => nil,
+        
+        # Week 5
+        25 => nil, 26 => nil, 27 => nil, 28 => nil
+      }
+    %>
+    
+    <!-- Calendar grid -->
+    <div class="grid grid-cols-7 gap-1">
+      <!-- Empty cells for days before February 1st (Feb 2025 starts on Saturday) -->
+      <% 5.times do %>
+        <div class="aspect-square"></div>
+      <% end %>
+      
+      <% (1..28).each do |day| %>
+        <% day_data = month_meals[day] %>
+        <%= link_to day_mockups_meal_plan_path(date: "2025-02-#{day.to_s.rjust(2, '0')}"), class: "aspect-square" do %>
+          <div class="h-full bg-gray-200 rounded-md p-1 hover:shadow-md transition-shadow relative <%= day_data&.dig(:selected) ? 'ring-2 ring-green-500' : '' %>">
+            <!-- Day number -->
+            <span class="text-xs font-medium text-gray-600 absolute top-1 right-1"><%= day %></span>
+            
+            <% if day_data && day_data[:meals] %>
+              <!-- Meal indicator bars -->
+              <div class="flex flex-col gap-0.5 mt-3">
+                <% day_data[:meals].each do |meal_colors| %>
+                  <div class="flex gap-px h-1.5">
+                    <% meal_colors.each do |color| %>
+                      <div class="flex-1 rounded-sm" style="background-color: <%= color %>;"></div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% elsif day_data&.dig(:selected) %>
+              <!-- Selected day cursor indicator -->
+              <div class="absolute bottom-1 right-1">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+                </svg>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Foods tried this month -->
+  <div class="px-4 py-4">
+    <h3 class="font-semibold text-gray-800 mb-3">Foods tried this month</h3>
+    <div class="flex gap-3 overflow-x-auto pb-2">
+      <% [
+        { name: 'Avocado', image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=100&h=100&fit=crop' },
+        { name: 'Broccoli', image: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=100&h=100&fit=crop' },
+        { name: 'Onion', image: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=100&h=100&fit=crop' },
+        { name: 'Garlic', image: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2f85?w=100&h=100&fit=crop' },
+        { name: 'Butternut', image: 'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=100&h=100&fit=crop' }
+      ].each do |food| %>
+        <div class="flex-shrink-0 text-center">
+          <div class="w-14 h-14 rounded-lg overflow-hidden mb-1 border border-gray-200">
+            <img src="<%= food[:image] %>" alt="<%= food[:name] %>" class="w-full h-full object-cover" onerror="this.src='/icon.png'">
+          </div>
+          <p class="text-xs text-gray-600"><%= food[:name] %></p>
         </div>
       <% end %>
-    <% end %>
+    </div>
   </div>
-</div>
 
-<!-- Legend -->
-<div class="px-4 pb-6">
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-    <h3 class="font-semibold text-[#2C3E50] text-sm mb-3">Legend</h3>
-    <div class="flex flex-wrap gap-4 text-xs">
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-1 bg-[#FF6B6B] rounded-full"></div>
-        <span class="text-gray-600">Meal planned</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-1 bg-[#4ECDC4] rounded-full"></div>
-        <span class="text-gray-600">Iron-rich</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-1 bg-amber-400 rounded-full"></div>
-        <span class="text-gray-600">Allergen</span>
-      </div>
+  <!-- Allergens tried this month -->
+  <div class="px-4 pb-6">
+    <h3 class="font-semibold text-gray-800 mb-3">Allergens tried this month</h3>
+    <div class="flex gap-3 overflow-x-auto pb-2">
+      <% [
+        { name: 'Peanut', image: 'https://images.unsplash.com/photo-1567892320421-1c657571ea4e?w=100&h=100&fit=crop' },
+        { name: 'Egg', image: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=100&h=100&fit=crop' },
+        { name: 'Shellfish', image: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=100&h=100&fit=crop' },
+        { name: 'Wheat', image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=100&h=100&fit=crop' }
+      ].each do |allergen| %>
+        <div class="flex-shrink-0 text-center">
+          <div class="w-14 h-14 rounded-lg overflow-hidden mb-1 border border-gray-200">
+            <img src="<%= allergen[:image] %>" alt="<%= allergen[:name] %>" class="w-full h-full object-cover" onerror="this.src='/icon.png'">
+          </div>
+          <p class="text-xs text-gray-600"><%= allergen[:name] %></p>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

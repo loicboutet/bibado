@@ -5,20 +5,6 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   
-  # Mockups V3 - Presale mockups with improved design
-  scope :mockups_v3, controller: 'mockups_v3' do
-    get '/', to: 'mockups_v3#meal_planner', as: :mockups_v3_root
-    get 'food_details', to: 'mockups_v3#food_details', as: :mockups_v3_food_details
-    get 'meal_planner', to: 'mockups_v3#meal_planner', as: :mockups_v3_meal_planner
-  end
-  
-  # Mockups V2 - Presale mockups with unified layout
-  scope :mockups_v2, controller: 'mockups_v2' do
-    get '/', to: 'mockups_v2#meal_planner', as: :mockups_v2_root
-    get 'food_details', to: 'mockups_v2#food_details', as: :mockups_v2_food_details
-    get 'meal_planner', to: 'mockups_v2#meal_planner', as: :mockups_v2_meal_planner
-  end
-  
   # Bibado Mockups namespace - Mobile-first weaning app mockups
   namespace :mockups do
     root to: 'home#index'

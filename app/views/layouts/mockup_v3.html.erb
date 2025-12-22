@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title><%= content_for(:title) || "Bibado" %></title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --teal: #6BA3A3;
+            --teal-dark: #4A8080;
+            --teal-light: #E8F4F4;
+            --orange: #E8A87C;
+            --orange-light: #F5D6C6;
+            --green: #7CB342;
+            --green-light: #E8F5E9;
+            --red: #E57373;
+            --red-light: #FFEBEE;
+            --gray-bg: #F5F5F5;
+            --gray-border: #E5E5E5;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #F5F5F5;
+        }
+        
+        .mobile-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Colors */
+        .bg-teal { background-color: var(--teal); }
+        .bg-teal-dark { background-color: var(--teal-dark); }
+        .bg-teal-light { background-color: var(--teal-light); }
+        .bg-orange { background-color: var(--orange); }
+        .bg-orange-light { background-color: var(--orange-light); }
+        .text-teal { color: var(--teal); }
+        .text-teal-dark { color: var(--teal-dark); }
+        .text-orange { color: var(--orange); }
+        .border-teal { border-color: var(--teal); }
+        
+        /* Burger menu button */
+        .burger-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            font-size: 28px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .burger-btn:hover {
+            color: #6B7280;
+        }
+        
+        /* Back button style */
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #F5F5F5;
+            color: #555;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .back-btn:hover {
+            background: #EBEBEB;
+        }
+        
+        /* Slide-out menu */
+        .slide-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s 0.3s, opacity 0.3s;
+        }
+        
+        .slide-menu.open {
+            visibility: visible;
+            opacity: 1;
+            transition: visibility 0s, opacity 0.3s;
+        }
+        
+        .slide-menu-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+        
+        .slide-menu-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            max-width: 80%;
+            background-color: white;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .slide-menu.open .slide-menu-panel {
+            transform: translateX(0);
+        }
+        
+        .menu-header {
+            background-color: var(--teal);
+            color: white;
+            padding: 24px 20px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            color: #374151;
+            border-bottom: 1px solid #F3F4F6;
+            text-decoration: none;
+        }
+        
+        .menu-item:hover {
+            background-color: var(--teal-light);
+        }
+        
+        .menu-item.active {
+            background-color: var(--teal-light);
+            color: var(--teal-dark);
+            font-weight: 500;
+        }
+        
+        .menu-item svg {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        
+        /* Bottom Navigation - v3 style */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background-color: var(--teal-light);
+            border-top: 1px solid #D0E0E0;
+            z-index: 50;
+            padding: 8px 4px 12px;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 9px;
+            color: #5A7A7A;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 8px;
+            min-width: 56px;
+            transition: all 0.2s;
+        }
+        
+        .nav-item:hover {
+            color: var(--teal-dark);
+        }
+        
+        .nav-item.active {
+            color: var(--teal-dark);
+            background-color: rgba(106, 163, 163, 0.2);
+        }
+        
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+        }
+        
+        /* Content padding for fixed nav */
+        .main-content {
+            padding-bottom: 80px;
+        }
+        
+        <%= yield :custom_styles %>
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Slide-out Menu -->
+        <div id="slideMenu" class="slide-menu">
+            <div class="slide-menu-overlay" onclick="toggleMenu()"></div>
+            <div class="slide-menu-panel">
+                <div class="menu-header">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-lg">Welcome!</p>
+                            <p class="text-sm opacity-80">Weaning Oliver</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="py-2">
+                    <%= link_to mockups_v3_meal_planner_path, class: "menu-item #{controller.action_name == 'meal_planner' ? 'active' : ''}" do %>
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Today / Meal Planner</span>
+                    <% end %>
+                    
+                    <a href="#" class="menu-item">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <span>Search Foods</span>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        <span>Meals & Recipes</span>
+                    </a>
+                    
+                    <%= link_to mockups_v3_food_details_path, class: "menu-item #{controller.action_name == 'food_details' ? 'active' : ''}" do %>
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Food Details</span>
+                    <% end %>
+                    
+                    <a href="#" class="menu-item">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        <span>Progress Tracker</span>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        <span>Learn</span>
+                    </a>
+                    
+                    <div class="border-t border-gray-200 my-2"></div>
+                    
+                    <a href="#" class="menu-item">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span>Profile</span>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Header - can be customized per page -->
+        <% if content_for?(:custom_header) %>
+            <%= yield :custom_header %>
+        <% else %>
+            <header class="bg-white py-4 px-4 border-b border-gray-100 sticky top-0 z-40">
+                <div class="flex items-center justify-between">
+                    <button class="burger-btn" onclick="toggleMenu()" type="button" aria-label="Open menu">☰</button>
+                    
+                    <div class="flex flex-col items-center">
+                        <h1 class="text-lg font-bold text-gray-700"><%= content_for(:page_title) || "Bibado" %></h1>
+                        <%= yield :header_subtitle %>
+                    </div>
+                    
+                    <% if content_for?(:header_right) %>
+                        <%= yield :header_right %>
+                    <% else %>
+                        <div class="w-10"></div>
+                    <% end %>
+                </div>
+            </header>
+        <% end %>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <%= yield %>
+        </main>
+
+        <!-- Bottom Navigation - v3 style -->
+        <nav class="bottom-nav">
+            <%= link_to mockups_v3_meal_planner_path, class: "nav-item #{controller.action_name == 'meal_planner' ? 'active' : ''}" do %>
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Today</span>
+            <% end %>
+            
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>Search</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                <span>Meals</span>
+            </a>
+            
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <span>Progress</span>
+            </a>
+            
+            <%= link_to mockups_v3_food_details_path, class: "nav-item #{controller.action_name == 'food_details' ? 'active' : ''}" do %>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Foods</span>
+            <% end %>
+            
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>Learn</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('slideMenu');
+            menu.classList.toggle('open');
+            document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const menu = document.getElementById('slideMenu');
+                if (menu.classList.contains('open')) {
+                    toggleMenu();
+                }
+            }
+        });
+    </script>
+    
+    <%= yield :page_scripts %>
+</body>
+</html>
